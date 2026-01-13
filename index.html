@@ -1,128 +1,62 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FORTE</title>
 
 <style>
 :root{
-  --bg:#000; --card:#111; --text:#fff; --sub:#aaa; --line:#222;
+  --bg:#000; --card:#111; --line:#222; --text:#fff; --sub:#aaa;
 }
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  display:flex;justify-content:center;
-}
-.app{
-  width:100%;max-width:420px;min-height:100vh;
-  border-left:1px solid var(--line);
-  border-right:1px solid var(--line);
-}
-header{
-  padding:16px;text-align:center;
-  border-bottom:1px solid var(--line);
-  letter-spacing:2px;font-weight:600;
-}
-section{display:none;padding:16px;padding-bottom:90px;}
+body{margin:0;background:var(--bg);color:var(--text);display:flex;justify-content:center;}
+.app{width:100%;max-width:420px;min-height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line);}
+header{padding:14px;text-align:center;border-bottom:1px solid var(--line);letter-spacing:2px;}
+section{display:none;padding:14px;padding-bottom:90px;}
 section.active{display:block;}
-nav{
-  position:fixed;bottom:0;width:100%;max-width:420px;
-  display:flex;border-top:1px solid var(--line);background:#000;
-}
-nav button{
-  flex:1;padding:14px 0;background:none;border:none;
-  color:var(--sub);font-size:12px;
-}
-nav button.active{color:var(--text);}
-.card{
-  background:var(--card);border:1px solid var(--line);
-  border-radius:12px;padding:14px;margin-bottom:12px;
-}
-.badge{
-  font-size:10px;border:1px solid #fff;
-  padding:2px 6px;border-radius:999px;margin-left:6px;
-}
-input,textarea{
-  width:100%;background:#000;color:#fff;
-  border:1px solid var(--line);border-radius:8px;
-  padding:10px;margin-bottom:8px;
-}
-textarea{resize:none;min-height:80px;}
-button.primary{
-  width:100%;background:#fff;color:#000;
-  border:none;border-radius:8px;
-  padding:12px;font-weight:600;
-}
-.comment{
-  border-top:1px solid var(--line);
-  padding-top:6px;margin-top:6px;font-size:14px;
-  white-space:pre-wrap;
-}
+nav{position:fixed;bottom:0;width:100%;max-width:420px;display:flex;border-top:1px solid var(--line);background:#000;}
+nav button{flex:1;background:none;border:none;color:var(--sub);padding:12px;font-size:12px;}
+nav button.active{color:#fff;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;}
+textarea,input{width:100%;background:#000;color:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;}
+button.primary{width:100%;background:#fff;color:#000;border:none;border-radius:8px;padding:10px;margin-top:6px;font-weight:600;}
+.small{font-size:12px;color:var(--sub);}
+.danger{background:none;border:1px solid #fff;color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;margin-right:4px;}
+.msg{max-width:70%;padding:8px 12px;border-radius:14px;font-size:14px;white-space:pre-wrap;}
+.fan{background:#111;align-self:flex-end;}
+.artist{background:#fff;color:#000;align-self:flex-start;}
 .chat-box{display:flex;flex-direction:column;gap:6px;}
-.msg{
-  max-width:70%;padding:8px 12px;
-  border-radius:12px;font-size:14px;
-  white-space:pre-wrap;
-}
-.fan{background:#fff;color:#000;align-self:flex-end;}
-.artist{background:#111;align-self:flex-start;}
-.center{color:var(--sub);text-align:center;margin-top:40px;}
-.danger{
-  background:none;color:#fff;border:1px solid #fff;
-  padding:10px;border-radius:8px;
-}
-
-/* LOGIN MODAL */
-.modal{
-  position:fixed;inset:0;background:#000;
-  display:flex;align-items:center;justify-content:center;z-index:999;
-}
-.modal-box{
-  width:90%;max-width:320px;border:1px solid var(--line);
-  border-radius:12px;padding:20px;background:#000;
-}
+.date{color:var(--sub);text-align:center;font-size:12px;margin:10px 0;}
+.profile{font-size:12px;margin-bottom:2px;display:flex;align-items:center;gap:6px;}
+.avatar{width:20px;height:20px;border-radius:50%;background:#000;border:1px solid #000;color:#000;display:flex;align-items:center;justify-content:center;font-size:12px;}
 </style>
 </head>
 
 <body>
-
-<!-- LOGIN -->
-<div class="modal" id="loginModal">
-  <div class="modal-box">
-    <h3 style="text-align:center;">LOGIN</h3>
-    <input id="loginId" placeholder="ID">
-    <input id="loginPw" type="password" placeholder="Password">
-    <button class="primary" onclick="login()">ENTER</button>
-  </div>
-</div>
-
-<div class="app" style="display:none;" id="app">
+<div class="app">
 <header>FORTE</header>
 
 <section id="home" class="active">
-  <div class="center">
-    Forte Official Fan Space<br/><br/>
-    BLACK & WHITE
-  </div>
-  <div id="resetArea"></div>
+  <div class="card small">Official Fan Space</div>
+  <div id="adminSettings"></div>
 </section>
 
 <section id="community">
   <div class="card">
-    <textarea id="postText" placeholder="Write something..."></textarea>
+    <textarea id="postInput" rows="3" placeholder="Write something..."></textarea>
     <button class="primary" onclick="addPost()">POST</button>
   </div>
-  <div id="posts"></div>
+  <div id="postList"></div>
 </section>
 
 <section id="chatlist">
-  <div class="card" onclick="openChat()">Forte (Artist)</div>
+  <div class="card" onclick="go('chat')">Forte</div>
 </section>
 
 <section id="chat">
   <div class="chat-box" id="chatBox"></div>
-  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter = Send)"></textarea>
+  <textarea id="chatInput" rows="2" placeholder="Message..."></textarea>
   <button class="primary" onclick="sendChat()">SEND</button>
 </section>
 
@@ -134,102 +68,138 @@ button.primary{
 </div>
 
 <script>
-let role=null;
-
 /* LOGIN */
-function login(){
-  const id=loginId.value.trim();
-  const pw=loginPw.value.trim();
-
-  if(id==="Artist" && pw==="Artist"){
-    role="fan";
-  }else if(id==="Forte" && pw==="01024773752"){
-    role="artist";
-  }else{
-    alert("로그인 정보가 틀렸어요.");
-    return;
-  }
-
-  localStorage.setItem("role",role);
-  loginModal.style.display="none";
-  app.style.display="block";
-  init();
+let role=null;
+while(!role){
+  const id=prompt("ID");
+  const pw=prompt("PASSWORD");
+  if(id==="Forte" && pw==="01024773752") role="admin";
+  else if(id==="Artist" && pw==="Artist") role="fan";
 }
 
-/* RESET */
-function init(){
-  if(role==="artist"){
-    resetArea.innerHTML=`<button class="danger" onclick="resetSite()">⚠ 사이트 초기화</button>`;
-  }
-  renderPosts(); renderChat();
-}
-function resetSite(){
-  if(!confirm("모든 내용이 삭제됩니다.")) return;
-  localStorage.removeItem("posts");
-  localStorage.removeItem("chats");
-  location.reload();
-}
+/* ADMIN PROFILE */
+let artistName=localStorage.getItem("artistName")||"Forte";
+let artistAvatar=localStorage.getItem("artistAvatar")||"●";
 
-/* POSTS */
+if(role==="admin"){
+  adminSettings.innerHTML=`
+  <div class="card">
+    <b>Admin Settings</b><br><br>
+    <input value="${artistName}" onchange="setName(this.value)">
+    <input value="${artistAvatar}" onchange="setAvatar(this.value)">
+  </div>`;
+}
+function setName(v){artistName=v;localStorage.setItem("artistName",v);renderChat();}
+function setAvatar(v){artistAvatar=v;localStorage.setItem("artistAvatar",v);renderChat();}
+
+/* COMMUNITY */
 let posts=JSON.parse(localStorage.getItem("posts")||"[]");
+
 function addPost(){
-  const t=postText.value.trim();
-  if(!t) return;
-  posts.unshift({text:t,role,comments:[]});
-  savePosts(); postText.value="";
-}
-function addComment(i,val){
-  if(!val.trim()) return;
-  posts[i].comments.push(val);
+  const t=postInput.value.trim();
+  if(!t)return;
+  posts.unshift({text:t,editing:false,comments:[]});
+  postInput.value="";
   savePosts();
 }
-function savePosts(){
-  localStorage.setItem("posts",JSON.stringify(posts));
-  renderPosts();
-}
+
 function renderPosts(){
-  postsEl.innerHTML="";
+  postList.innerHTML="";
   posts.forEach((p,i)=>{
-    postsEl.innerHTML+=`
+    postList.innerHTML+=`
     <div class="card">
-      <b>${p.role==="artist"?"Forte":"Fan"}
-      ${p.role==="artist"?'<span class="badge">Artist</span>':""}</b>
-      <p style="white-space:pre-wrap;">${p.text}</p>
-      <textarea placeholder="Comment..."
-        onkeydown="if(event.key==='Enter'&&event.ctrlKey)addComment(${i},this.value)"></textarea>
-      ${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}
+      ${p.editing?`
+        <textarea onchange="editPost(${i},this.value)">${p.text}</textarea>
+        <button class="danger" onclick="toggleEdit(${i})">DONE</button>
+      `:`<pre>${p.text}</pre>`}
+      ${role==="admin" && !p.editing?`
+        <button class="danger" onclick="toggleEdit(${i})">EDIT</button>
+        <button class="danger" onclick="deletePost(${i})">DEL</button>`:""}
+      <textarea placeholder="comment..." onkeydown="if(event.key==='Enter')addComment(${i},this.value)"></textarea>
+      ${p.comments.map((c,ci)=>`
+        <div class="small">
+          ${c.editing?`
+            <input value="${c.text}" onchange="editComment(${i},${ci},this.value)">
+            <button class="danger" onclick="toggleComment(${i},${ci})">OK</button>
+          `:c.text}
+          ${role==="admin" && !c.editing?`
+            <button class="danger" onclick="toggleComment(${i},${ci})">E</button>
+            <button class="danger" onclick="deleteComment(${i},${ci})">X</button>`:""}
+        </div>`).join("")}
     </div>`;
   });
 }
 
+function toggleEdit(i){posts[i].editing=!posts[i].editing;savePosts();}
+function editPost(i,v){posts[i].text=v;}
+function deletePost(i){posts.splice(i,1);savePosts();}
+
+function addComment(i,t){
+  if(!t)return;
+  posts[i].comments.push({text:t,editing:false});
+  savePosts();
+}
+function toggleComment(i,ci){posts[i].comments[ci].editing=!posts[i].comments[ci].editing;savePosts();}
+function editComment(i,ci,v){posts[i].comments[ci].text=v;}
+function deleteComment(i,ci){posts[i].comments.splice(ci,1);savePosts();}
+function savePosts(){localStorage.setItem("posts",JSON.stringify(posts));renderPosts();}
+
 /* CHAT */
 let chats=JSON.parse(localStorage.getItem("chats")||"[]");
-function openChat(){go("chat");renderChat();}
+
 function sendChat(){
   const t=chatInput.value.trim();
-  if(!t) return;
-  chats.push({text:t,role});
-  localStorage.setItem("chats",JSON.stringify(chats));
-  chatInput.value=""; renderChat();
+  if(!t)return;
+  chats.push({
+    text:t, editing:false,
+    role:role,
+    date:new Date().toLocaleDateString()
+  });
+  chatInput.value="";
+  saveChat();
 }
-chatInput?.addEventListener("keydown",e=>{
-  if(e.ctrlKey&&e.key==="Enter") sendChat();
-});
+
 function renderChat(){
   chatBox.innerHTML="";
-  chats.forEach(m=>{
-    chatBox.innerHTML+=`<div class="msg ${m.role}">${m.text}</div>`;
+  let last="";
+  chats.forEach((m,i)=>{
+    if(m.date!==last){
+      chatBox.innerHTML+=`<div class="date">── ${m.date} ──</div>`;
+      last=m.date;
+    }
+    chatBox.innerHTML+=`
+    <div class="msg ${m.role==="admin"?"artist":"fan"}">
+      ${m.role==="admin"?`
+        <div class="profile">
+          <div class="avatar">${artistAvatar}</div>${artistName}
+        </div>`:""}
+      ${m.editing?`
+        <textarea onchange="editChat(${i},this.value)">${m.text}</textarea>
+        <button class="danger" onclick="toggleChat(${i})">OK</button>
+      `:m.text}
+      ${role==="admin" && !m.editing?`
+        <button class="danger" onclick="toggleChat(${i})">EDIT</button>
+        <button class="danger" onclick="deleteChat(${i})">DEL</button>`:""}
+    </div>`;
   });
 }
+
+function toggleChat(i){chats[i].editing=!chats[i].editing;saveChat();}
+function editChat(i,v){chats[i].text=v;}
+function deleteChat(i){chats.splice(i,1);saveChat();}
+function saveChat(){localStorage.setItem("chats",JSON.stringify(chats));renderChat();}
 
 /* NAV */
 function go(id,btn){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  if(btn)btn.classList.add("active");
 }
+
+renderPosts();renderChat();
 </script>
 </body>
 </html>
+
 
