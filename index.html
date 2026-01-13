@@ -11,81 +11,103 @@
 }
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 body{
-  margin:0; background:var(--bg); color:var(--text);
-  display:flex; justify-content:center;
+  margin:0;background:var(--bg);color:var(--text);
+  display:flex;justify-content:center;
 }
 .app{
-  width:100%; max-width:420px; min-height:100vh;
+  width:100%;max-width:420px;min-height:100vh;
   border-left:1px solid var(--line);
   border-right:1px solid var(--line);
 }
 header{
-  padding:16px; text-align:center;
+  padding:16px;text-align:center;
   border-bottom:1px solid var(--line);
-  letter-spacing:2px; font-weight:600;
+  letter-spacing:2px;font-weight:600;
 }
 section{display:none;padding:16px;padding-bottom:90px;}
 section.active{display:block;}
 nav{
-  position:fixed; bottom:0; width:100%; max-width:420px;
-  display:flex; border-top:1px solid var(--line); background:#000;
+  position:fixed;bottom:0;width:100%;max-width:420px;
+  display:flex;border-top:1px solid var(--line);background:#000;
 }
 nav button{
-  flex:1; padding:14px 0; background:none; border:none;
-  color:var(--sub); font-size:12px;
+  flex:1;padding:14px 0;background:none;border:none;
+  color:var(--sub);font-size:12px;
 }
 nav button.active{color:var(--text);}
 .card{
-  background:var(--card); border:1px solid var(--line);
-  border-radius:12px; padding:14px; margin-bottom:12px;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:14px;margin-bottom:12px;
 }
 .badge{
-  font-size:10px; border:1px solid #fff;
-  padding:2px 6px; border-radius:999px; margin-left:6px;
+  font-size:10px;border:1px solid #fff;
+  padding:2px 6px;border-radius:999px;margin-left:6px;
 }
 input,textarea{
-  width:100%; background:#000; color:#fff;
-  border:1px solid var(--line); border-radius:8px;
-  padding:10px; margin-bottom:8px;
+  width:100%;background:#000;color:#fff;
+  border:1px solid var(--line);border-radius:8px;
+  padding:10px;margin-bottom:8px;
 }
+textarea{resize:none;min-height:80px;}
 button.primary{
-  width:100%; background:#fff; color:#000;
-  border:none; border-radius:8px;
-  padding:12px; font-weight:600;
+  width:100%;background:#fff;color:#000;
+  border:none;border-radius:8px;
+  padding:12px;font-weight:600;
 }
 .comment{
   border-top:1px solid var(--line);
-  padding-top:6px; margin-top:6px; font-size:14px;
+  padding-top:6px;margin-top:6px;font-size:14px;
+  white-space:pre-wrap;
 }
 .chat-box{display:flex;flex-direction:column;gap:6px;}
 .msg{
-  max-width:70%; padding:8px 12px;
-  border-radius:12px; font-size:14px;
+  max-width:70%;padding:8px 12px;
+  border-radius:12px;font-size:14px;
+  white-space:pre-wrap;
 }
-.fan{background:#111;align-self:flex-start;}
-.artist{background:#fff;color:#000;align-self:flex-end;}
+.fan{background:#fff;color:#000;align-self:flex-end;}
+.artist{background:#111;align-self:flex-start;}
 .center{color:var(--sub);text-align:center;margin-top:40px;}
 .danger{
-  background:none; color:#fff; border:1px solid #fff;
-  padding:10px; border-radius:8px;
+  background:none;color:#fff;border:1px solid #fff;
+  padding:10px;border-radius:8px;
+}
+
+/* LOGIN MODAL */
+.modal{
+  position:fixed;inset:0;background:#000;
+  display:flex;align-items:center;justify-content:center;z-index:999;
+}
+.modal-box{
+  width:90%;max-width:320px;border:1px solid var(--line);
+  border-radius:12px;padding:20px;background:#000;
 }
 </style>
 </head>
 
 <body>
-<div class="app">
+
+<!-- LOGIN -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h3 style="text-align:center;">LOGIN</h3>
+    <input id="loginId" placeholder="ID">
+    <input id="loginPw" type="password" placeholder="Password">
+    <button class="primary" onclick="login()">ENTER</button>
+  </div>
+</div>
+
+<div class="app" style="display:none;" id="app">
 <header>FORTE</header>
 
-<!-- HOME -->
 <section id="home" class="active">
   <div class="center">
     Forte Official Fan Space<br/><br/>
-    MUSE · BLACK & WHITE
+    BLACK & WHITE
   </div>
   <div id="resetArea"></div>
 </section>
 
-<!-- COMMUNITY -->
 <section id="community">
   <div class="card">
     <textarea id="postText" placeholder="Write something..."></textarea>
@@ -94,15 +116,13 @@ button.primary{
   <div id="posts"></div>
 </section>
 
-<!-- CHAT LIST -->
 <section id="chatlist">
   <div class="card" onclick="openChat()">Forte (Artist)</div>
 </section>
 
-<!-- CHAT -->
 <section id="chat">
   <div class="chat-box" id="chatBox"></div>
-  <input id="chatInput" placeholder="Message..." />
+  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter = Send)"></textarea>
   <button class="primary" onclick="sendChat()">SEND</button>
 </section>
 
@@ -114,37 +134,52 @@ button.primary{
 </div>
 
 <script>
-/* ROLE */
-let role = localStorage.getItem("role");
-if(!role){
-  role = confirm("Artist(Forte)로 접속할까요?") ? "artist" : "fan";
+let role=null;
+
+/* LOGIN */
+function login(){
+  const id=loginId.value.trim();
+  const pw=loginPw.value.trim();
+
+  if(id==="Artist" && pw==="Artist"){
+    role="fan";
+  }else if(id==="Forte" && pw==="01024773752"){
+    role="artist";
+  }else{
+    alert("로그인 정보가 틀렸어요.");
+    return;
+  }
+
   localStorage.setItem("role",role);
+  loginModal.style.display="none";
+  app.style.display="block";
+  init();
 }
 
-/* RESET (Artist only) */
-if(role==="artist"){
-  document.getElementById("resetArea").innerHTML = `
-    <button class="danger" onclick="resetSite()">⚠ 사이트 내용 초기화</button>
-  `;
+/* RESET */
+function init(){
+  if(role==="artist"){
+    resetArea.innerHTML=`<button class="danger" onclick="resetSite()">⚠ 사이트 초기화</button>`;
+  }
+  renderPosts(); renderChat();
 }
 function resetSite(){
-  if(!confirm("모든 글·댓글·채팅이 삭제됩니다. 계속할까요?")) return;
+  if(!confirm("모든 내용이 삭제됩니다.")) return;
   localStorage.removeItem("posts");
   localStorage.removeItem("chats");
   location.reload();
 }
 
 /* POSTS */
-let posts = JSON.parse(localStorage.getItem("posts")||"[]");
-
+let posts=JSON.parse(localStorage.getItem("posts")||"[]");
 function addPost(){
-  const text = postText.value.trim();
-  if(!text) return;
-  posts.unshift({text,role,comments:[]});
+  const t=postText.value.trim();
+  if(!t) return;
+  posts.unshift({text:t,role,comments:[]});
   savePosts(); postText.value="";
 }
 function addComment(i,val){
-  if(!val) return;
+  if(!val.trim()) return;
   posts[i].comments.push(val);
   savePosts();
 }
@@ -153,35 +188,37 @@ function savePosts(){
   renderPosts();
 }
 function renderPosts(){
-  const el=document.getElementById("posts");
-  el.innerHTML="";
+  postsEl.innerHTML="";
   posts.forEach((p,i)=>{
-    el.innerHTML+=`
-      <div class="card">
-        <b>${p.role==="artist"?"Forte":"Fan"}
-        ${p.role==="artist"?'<span class="badge">Artist</span>':""}</b>
-        <p>${p.text}</p>
-        <input placeholder="Comment..."
-        onkeydown="if(event.key==='Enter')addComment(${i},this.value)">
-        ${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}
-      </div>`;
+    postsEl.innerHTML+=`
+    <div class="card">
+      <b>${p.role==="artist"?"Forte":"Fan"}
+      ${p.role==="artist"?'<span class="badge">Artist</span>':""}</b>
+      <p style="white-space:pre-wrap;">${p.text}</p>
+      <textarea placeholder="Comment..."
+        onkeydown="if(event.key==='Enter'&&event.ctrlKey)addComment(${i},this.value)"></textarea>
+      ${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}
+    </div>`;
   });
 }
 
 /* CHAT */
-let chats = JSON.parse(localStorage.getItem("chats")||"[]");
+let chats=JSON.parse(localStorage.getItem("chats")||"[]");
 function openChat(){go("chat");renderChat();}
 function sendChat(){
-  const t=chatInput.value.trim(); if(!t) return;
+  const t=chatInput.value.trim();
+  if(!t) return;
   chats.push({text:t,role});
   localStorage.setItem("chats",JSON.stringify(chats));
   chatInput.value=""; renderChat();
 }
+chatInput?.addEventListener("keydown",e=>{
+  if(e.ctrlKey&&e.key==="Enter") sendChat();
+});
 function renderChat(){
-  const box=document.getElementById("chatBox");
-  box.innerHTML="";
+  chatBox.innerHTML="";
   chats.forEach(m=>{
-    box.innerHTML+=`<div class="msg ${m.role}">${m.text}</div>`;
+    chatBox.innerHTML+=`<div class="msg ${m.role}">${m.text}</div>`;
   });
 }
 
@@ -192,8 +229,7 @@ function go(id,btn){
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
 }
-
-renderPosts(); renderChat();
 </script>
 </body>
 </html>
+
