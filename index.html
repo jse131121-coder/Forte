@@ -1,183 +1,264 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>FORTE</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;background:black;color:white;font-family:Arial}
-.hidden{display:none}
-.center{
-  height:100vh;display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center
+:root{
+  --bg:#000; --card:#111; --text:#fff; --sub:#aaa; --line:#222;
 }
-input,textarea,button{
-  width:80%;max-width:400px;
-  background:black;color:white;
-  border:1px solid white;
-  padding:10px;margin:5px 0
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  display:flex;justify-content:center;
 }
+.app{
+  width:100%;max-width:420px;min-height:100vh;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
+}
+header{
+  padding:16px;text-align:center;
+  border-bottom:1px solid var(--line);
+  letter-spacing:2px;font-weight:600;
+}
+section{display:none;padding:16px;padding-bottom:90px;}
+section.active{display:block;}
 nav{
-  display:flex;justify-content:space-around;
-  border-bottom:1px solid white;
-  padding:10px 0
+  position:fixed;bottom:0;width:100%;max-width:420px;
+  display:flex;border-top:1px solid var(--line);background:#000;
 }
-.page{padding:10px}
-.post,.chat{border-bottom:1px solid #333;padding:8px}
-.chat.forte{text-align:left}
-.chat.artist{text-align:right}
-.date{text-align:center;opacity:.5;font-size:12px;margin:10px 0}
-pre{white-space:pre-wrap}
+nav button{
+  flex:1;padding:14px 0;background:none;border:none;
+  color:var(--sub);font-size:12px;
+}
+nav button.active{color:var(--text);}
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:14px;margin-bottom:12px;
+}
+.badge{
+  font-size:10px;border:1px solid #fff;
+  padding:2px 6px;border-radius:999px;margin-left:6px;
+}
+input,textarea{
+  width:100%;background:#000;color:#fff;
+  border:1px solid var(--line);border-radius:8px;
+  padding:10px;margin-bottom:8px;
+}
+textarea{resize:none;min-height:80px;}
+button.primary{
+  width:100%;background:#fff;color:#000;
+  border:none;border-radius:8px;
+  padding:12px;font-weight:600;
+}
+.comment{
+  border-top:1px solid var(--line);
+  padding-top:6px;margin-top:6px;font-size:14px;
+  white-space:pre-wrap;
+}
+.chat-box{display:flex;flex-direction:column;gap:6px;}
+.msg{
+  max-width:70%;padding:8px 12px;
+  border-radius:12px;font-size:14px;
+  white-space:pre-wrap;
+}
+.fan{background:#fff;color:#000;align-self:flex-end;}
+.artist{background:#111;align-self:flex-start;}
+.center{color:var(--sub);text-align:center;margin-top:40px;}
+.danger{
+  background:none;color:#fff;border:1px solid #fff;
+  padding:10px;border-radius:8px;
+}
+
+/* LOGIN MODAL */
+.modal{
+  position:fixed;inset:0;background:#000;
+  display:flex;align-items:center;justify-content:center;z-index:999;
+}
+.modal-box{
+  width:90%;max-width:320px;border:1px solid var(--line);
+  border-radius:12px;padding:20px;background:#000;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 로그인 -->
-<div id="loginBox" class="center">
-  <h1>FORTE</h1>
-  <input id="idInput" placeholder="ID">
-  <input id="pwInput" type="password" placeholder="Password">
-  <button onclick="doLogin()">LOGIN</button>
+<!-- LOGIN -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h3 style="text-align:center;">LOGIN</h3>
+    <input id="loginId" placeholder="ID">
+    <input id="loginPw" type="password" placeholder="Password">
+    <button class="primary" onclick="login()">ENTER</button>
+  </div>
 </div>
 
-<!-- 앱 -->
-<div id="appBox" class="hidden">
+<div class="app" id="app" style="display:none;">
+<header>FORTE</header>
+
+<section id="home" class="active">
+  <div class="center">
+    Forte Official Fan Space<br/><br/>
+    BLACK & WHITE
+  </div>
+  <div id="resetArea"></div>
+</section>
+
+<section id="community">
+  <div class="card">
+    <textarea id="postText" placeholder="Write something..."></textarea>
+    <button class="primary" onclick="addPost()">POST</button>
+  </div>
+  <div id="posts"></div>
+</section>
+
+<section id="chatlist">
+  <div class="card" onclick="openChat()">Forte (Artist)</div>
+</section>
+
+<section id="chat">
+  <div class="chat-box" id="chatBox"></div>
+  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter = Send)"></textarea>
+  <button class="primary" onclick="sendChat()">SEND</button>
+</section>
 
 <nav>
-  <button onclick="showPage('home')">HOME</button>
-  <button onclick="showPage('community')">COMMUNITY</button>
-  <button onclick="showPage('chat')">CHAT</button>
+  <button class="active" onclick="go('home',this)">HOME</button>
+  <button onclick="go('community',this)">COMMUNITY</button>
+  <button onclick="go('chatlist',this)">CHAT</button>
 </nav>
-
-<section id="home" class="page">
-  Welcome to FORTE.
-</section>
-
-<section id="community" class="page hidden">
-  <textarea id="postText" placeholder="Write... (줄바꿈 가능)"></textarea>
-  <button onclick="addPost()">POST</button>
-  <div id="postList"></div>
-</section>
-
-<section id="chat" class="page hidden">
-  <div id="chatBox"></div>
-  <textarea id="chatText" placeholder="Message... (줄바꿈 가능)"></textarea>
-  <button onclick="sendChat()">SEND</button>
-</section>
-
 </div>
 
 <script>
-let user = null;
+/* ===== GLOBAL ===== */
+let role = null;
+const postsEl = document.getElementById("posts");
+const chatBox = document.getElementById("chatBox");
 
-let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+/* ===== LOGIN ===== */
+function login(){
+  const id = loginId.value.trim();
+  const pw = loginPw.value.trim();
 
-/* 로그인 */
-function doLogin(){
-  const id = document.getElementById("idInput").value;
-  const pw = document.getElementById("pwInput").value;
+  if(id==="Artist" && pw==="Artist"){
+    role="fan";
+  }else if(id==="Forte" && pw==="01024773752"){
+    role="artist";
+  }else{
+    alert("로그인 정보가 틀렸어요.");
+    return;
+  }
 
-  if(id==="Artist" && pw==="Artist") user="Artist";
-  else if(id==="Forte" && pw==="01024773752") user="Forte";
-  else { alert("로그인 실패"); return; }
+  localStorage.setItem("role",role);
+  loginModal.style.display="none";
+  app.style.display="block";
+  init();
+}
 
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("appBox").classList.remove("hidden");
-
+/* ===== INIT ===== */
+function init(){
+  if(role==="artist"){
+    resetArea.innerHTML =
+      `<button class="danger" onclick="resetSite()">⚠ 사이트 초기화</button>`;
+  }
   renderPosts();
-  renderChats();
+  renderChat();
 }
 
-/* 페이지 */
-function showPage(p){
-  document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
-  document.getElementById(p).classList.remove("hidden");
+/* ===== RESET ===== */
+function resetSite(){
+  if(!confirm("모든 내용이 삭제됩니다.")) return;
+  localStorage.removeItem("posts");
+  localStorage.removeItem("chats");
+  location.reload();
 }
 
-/* 커뮤니티 */
+/* ===== COMMUNITY ===== */
+let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
 function addPost(){
-  const t=document.getElementById("postText");
-  if(!t.value.trim()) return;
+  const t = postText.value.trim();
+  if(!t) return;
+  posts.unshift({text:t,role,comments:[]});
+  postText.value="";
+  savePosts();
+}
 
-  posts.push({text:t.value});
+function addComment(i,val){
+  if(!val.trim()) return;
+  posts[i].comments.push(val);
+  savePosts();
+}
+
+function savePosts(){
   localStorage.setItem("posts",JSON.stringify(posts));
-  t.value="";
   renderPosts();
 }
 
 function renderPosts(){
-  const l=document.getElementById("postList");
-  l.innerHTML="";
+  postsEl.innerHTML="";
   posts.forEach((p,i)=>{
-    const d=document.createElement("div");
-    d.className="post";
-    d.innerHTML=`
-      <pre>${p.text}</pre>
-      ${user==="Forte"?`<button onclick="delPost(${i})">삭제</button>`:""}
+    postsEl.innerHTML += `
+      <div class="card">
+        <b>${p.role==="artist"?"Forte":"Fan"}
+        ${p.role==="artist"?'<span class="badge">Artist</span>':""}</b>
+        <p style="white-space:pre-wrap;">${p.text}</p>
+        <textarea placeholder="Comment..."
+          onkeydown="if(event.key==='Enter'&&event.ctrlKey)addComment(${i},this.value)"></textarea>
+        ${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}
+      </div>
     `;
-    l.appendChild(d);
   });
 }
 
-function delPost(i){
-  posts.splice(i,1);
-  localStorage.setItem("posts",JSON.stringify(posts));
-  renderPosts();
+/* ===== CHAT ===== */
+let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+
+function openChat(){
+  go("chat");
+  renderChat();
 }
 
-/* 채팅 */
 function sendChat(){
-  const t=document.getElementById("chatText");
-  if(!t.value.trim()) return;
-
-  chats.push({
-    user:user,
-    text:t.value,
-    date:new Date().toDateString()
-  });
+  const t = chatInput.value.trim();
+  if(!t) return;
+  chats.push({text:t,role});
+  chatInput.value="";
   localStorage.setItem("chats",JSON.stringify(chats));
-  t.value="";
-  renderChats();
+  renderChat();
 }
 
-function renderChats(){
-  const b=document.getElementById("chatBox");
-  b.innerHTML="";
-  let last="";
+chatInput.addEventListener("keydown",e=>{
+  if(e.ctrlKey && e.key==="Enter") sendChat();
+});
 
-  chats.forEach((c,i)=>{
-    if(c.date!==last){
-      const d=document.createElement("div");
-      d.className="date";
-      d.innerText=c.date;
-      b.appendChild(d);
-      last=c.date;
-    }
-    const div=document.createElement("div");
-    div.className=`chat ${c.user==="Forte"?"forte":"artist"}`;
-    div.innerHTML=`
-      ${c.user==="Forte"?"Forte 🖤<br>":""}
-      <pre>${c.text}</pre>
-      ${user==="Forte"?`<button onclick="delChat(${i})">삭제</button>`:""}
-    `;
-    b.appendChild(div);
+function renderChat(){
+  chatBox.innerHTML="";
+  chats.forEach(m=>{
+    chatBox.innerHTML +=
+      `<div class="msg ${m.role}">${m.text}</div>`;
   });
 }
 
-function delChat(i){
-  chats.splice(i,1);
-  localStorage.setItem("chats",JSON.stringify(chats));
-  renderChats();
+/* ===== NAV ===== */
+function go(id,btn){
+  document.querySelectorAll("section")
+    .forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll("nav button")
+    .forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
 }
 </script>
 
 </body>
 </html>
+
 
 
  
