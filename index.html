@@ -2,49 +2,34 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FORTE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box;font-family:Arial}
-body{margin:0;background:black;color:white}
+body{margin:0;background:black;color:white;font-family:Arial}
 .hidden{display:none}
-
 .center{
-  height:100vh;
-  display:flex;
+  height:100vh;display:flex;
   flex-direction:column;
-  align-items:center;
-  justify-content:center
+  justify-content:center;
+  align-items:center
 }
-
 input,textarea,button{
-  width:80%;
-  max-width:400px;
-  background:black;
-  color:white;
+  width:80%;max-width:400px;
+  background:black;color:white;
   border:1px solid white;
-  padding:10px;
-  margin:5px 0
+  padding:10px;margin:5px 0
 }
-
 nav{
-  display:flex;
-  justify-content:space-around;
+  display:flex;justify-content:space-around;
   border-bottom:1px solid white;
   padding:10px 0
 }
-
 .page{padding:10px}
 .post,.chat{border-bottom:1px solid #333;padding:8px}
 .chat.forte{text-align:left}
 .chat.artist{text-align:right}
-.date{
-  text-align:center;
-  font-size:12px;
-  opacity:.5;
-  margin:10px 0
-}
+.date{text-align:center;opacity:.5;font-size:12px;margin:10px 0}
 pre{white-space:pre-wrap}
 </style>
 </head>
@@ -52,20 +37,20 @@ pre{white-space:pre-wrap}
 <body>
 
 <!-- 로그인 -->
-<div id="loginScreen" class="center">
+<div id="loginBox" class="center">
   <h1>FORTE</h1>
-  <input id="uid" placeholder="ID">
-  <input id="upw" type="password" placeholder="Password">
-  <button onclick="login()">LOGIN</button>
+  <input id="idInput" placeholder="ID">
+  <input id="pwInput" type="password" placeholder="Password">
+  <button onclick="doLogin()">LOGIN</button>
 </div>
 
 <!-- 앱 -->
-<div id="app" class="hidden">
+<div id="appBox" class="hidden">
 
 <nav>
-  <button onclick="show('home')">HOME</button>
-  <button onclick="show('community')">COMMUNITY</button>
-  <button onclick="show('chat')">CHAT</button>
+  <button onclick="showPage('home')">HOME</button>
+  <button onclick="showPage('community')">COMMUNITY</button>
+  <button onclick="showPage('chat')">CHAT</button>
 </nav>
 
 <section id="home" class="page">
@@ -73,136 +58,126 @@ pre{white-space:pre-wrap}
 </section>
 
 <section id="community" class="page hidden">
-  <textarea id="postInput" placeholder="Write... (줄바꿈 가능)"></textarea>
+  <textarea id="postText" placeholder="Write... (줄바꿈 가능)"></textarea>
   <button onclick="addPost()">POST</button>
   <div id="postList"></div>
 </section>
 
 <section id="chat" class="page hidden">
   <div id="chatBox"></div>
-  <textarea id="chatInput" placeholder="Message... (줄바꿈 가능)"></textarea>
+  <textarea id="chatText" placeholder="Message... (줄바꿈 가능)"></textarea>
   <button onclick="sendChat()">SEND</button>
 </section>
 
 </div>
 
 <script>
-let currentUser = null;
+let user = null;
 
-/* 데이터 */
 let posts = JSON.parse(localStorage.getItem("posts") || "[]");
 let chats = JSON.parse(localStorage.getItem("chats") || "[]");
 
 /* 로그인 */
-function login(){
-  const id = document.getElementById("uid").value;
-  const pw = document.getElementById("upw").value;
+function doLogin(){
+  const id = document.getElementById("idInput").value;
+  const pw = document.getElementById("pwInput").value;
 
-  if(id==="Artist" && pw==="Artist") currentUser="Artist";
-  else if(id==="Forte" && pw==="01024773752") currentUser="Forte";
-  else return alert("로그인 실패");
+  if(id==="Artist" && pw==="Artist") user="Artist";
+  else if(id==="Forte" && pw==="01024773752") user="Forte";
+  else { alert("로그인 실패"); return; }
 
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("appBox").classList.remove("hidden");
 
   renderPosts();
   renderChats();
 }
 
-/* 페이지 전환 */
-function show(page){
-  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-  document.getElementById(page).classList.remove("hidden");
+/* 페이지 */
+function showPage(p){
+  document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
+  document.getElementById(p).classList.remove("hidden");
 }
 
 /* 커뮤니티 */
 function addPost(){
-  const input = document.getElementById("postInput");
-  if(!input.value.trim()) return;
+  const t=document.getElementById("postText");
+  if(!t.value.trim()) return;
 
-  posts.push({
-    text: input.value,
-    time: Date.now()
-  });
-
-  localStorage.setItem("posts", JSON.stringify(posts));
-  input.value="";
+  posts.push({text:t.value});
+  localStorage.setItem("posts",JSON.stringify(posts));
+  t.value="";
   renderPosts();
 }
 
 function renderPosts(){
-  const list = document.getElementById("postList");
-  list.innerHTML="";
+  const l=document.getElementById("postList");
+  l.innerHTML="";
   posts.forEach((p,i)=>{
-    const div=document.createElement("div");
-    div.className="post";
-    div.innerHTML=`
+    const d=document.createElement("div");
+    d.className="post";
+    d.innerHTML=`
       <pre>${p.text}</pre>
-      ${currentUser==="Forte"
-        ? `<button onclick="deletePost(${i})">삭제</button>`
-        : ""}
+      ${user==="Forte"?`<button onclick="delPost(${i})">삭제</button>`:""}
     `;
-    list.appendChild(div);
+    l.appendChild(d);
   });
 }
 
-function deletePost(i){
+function delPost(i){
   posts.splice(i,1);
-  localStorage.setItem("posts", JSON.stringify(posts));
+  localStorage.setItem("posts",JSON.stringify(posts));
   renderPosts();
 }
 
 /* 채팅 */
 function sendChat(){
-  const input = document.getElementById("chatInput");
-  if(!input.value.trim()) return;
+  const t=document.getElementById("chatText");
+  if(!t.value.trim()) return;
 
   chats.push({
-    user: currentUser,
-    text: input.value,
-    date: new Date().toDateString()
+    user:user,
+    text:t.value,
+    date:new Date().toDateString()
   });
-
-  localStorage.setItem("chats", JSON.stringify(chats));
-  input.value="";
+  localStorage.setItem("chats",JSON.stringify(chats));
+  t.value="";
   renderChats();
 }
 
 function renderChats(){
-  const box = document.getElementById("chatBox");
-  box.innerHTML="";
-  let lastDate="";
+  const b=document.getElementById("chatBox");
+  b.innerHTML="";
+  let last="";
 
   chats.forEach((c,i)=>{
-    if(c.date !== lastDate){
+    if(c.date!==last){
       const d=document.createElement("div");
       d.className="date";
       d.innerText=c.date;
-      box.appendChild(d);
-      lastDate=c.date;
+      b.appendChild(d);
+      last=c.date;
     }
-
     const div=document.createElement("div");
     div.className=`chat ${c.user==="Forte"?"forte":"artist"}`;
     div.innerHTML=`
-      ${c.user==="Forte" ? "Forte 🖤<br>" : ""}
+      ${c.user==="Forte"?"Forte 🖤<br>":""}
       <pre>${c.text}</pre>
-      ${currentUser==="Forte"
-        ? `<button onclick="deleteChat(${i})">삭제</button>`
-        : ""}
+      ${user==="Forte"?`<button onclick="delChat(${i})">삭제</button>`:""}
     `;
-    box.appendChild(div);
+    b.appendChild(div);
   });
 }
 
-function deleteChat(i){
+function delChat(i){
   chats.splice(i,1);
-  localStorage.setItem("chats", JSON.stringify(chats));
+  localStorage.setItem("chats",JSON.stringify(chats));
   renderChats();
 }
 </script>
 
 </body>
 </html>
+
 
  
