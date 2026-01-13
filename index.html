@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FORTE</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --card: #111;
+      --text: #fff;
+      --sub: #aaa;
+      --line: #222;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+
+    /* PC 중앙 고정 */
+    .app {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      background: var(--bg);
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+    }
+
+    header {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--line);
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid var(--line);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 420px;
+      background: #000;
+    }
+
+    nav button {
+      flex: 1;
+      padding: 14px 0;
+      background: none;
+      border: none;
+      color: var(--sub);
+      font-size: 12px;
+    }
+
+    nav button.active { color: var(--text); }
+
+    section {
+      display: none;
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+    section.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      font-size: 10px;
+      border: 1px solid #fff;
+      padding: 2px 6px;
+      border-radius: 999px;
+      margin-left: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #000;
+      border: 1px solid var(--line);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    button.primary {
+      width: 100%;
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .comment {
+      border-top: 1px solid var(--line);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .msg {
+      max-width: 70%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .fan { background: #111; align-self: flex-start; }
+    .artist { background: #fff; color: #000; align-self: flex-end; }
+
+    .center {
+      text-align: center;
+      color: var(--sub);
+      font-size: 14px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <header>FORTE</header>
+
+  <!-- HOME -->
+  <section id="home" class="active">
+    <div class="center">
+      MUSE / BLACK & WHITE<br/><br/>
+      Forte Official Fan Space
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community">
+    <div class="card">
+      <textarea id="postText" placeholder="Write something..."></textarea>
+      <button class="primary" onclick="addPost()">POST</button>
+    </div>
+    <div id="posts"></div>
+  </section>
+
+  <!-- CHAT LIST -->
+  <section id="chatlist">
+    <div class="card" onclick="openChat()">Forte (Artist)</div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="chat">
+    <div class="chat-box" id="chatBox"></div>
+    <input id="chatInput" placeholder="Message..." />
+    <button class="primary" onclick="sendChat()">SEND</button>
+  </section>
+
+  <nav>
+    <button class="active" onclick="go('home', this)">HOME</button>
+    <button onclick="go('community', this)">COMMUNITY</button>
+    <button onclick="go('chatlist', this)">CHAT</button>
+  </nav>
+
+</div>
+
+<script>
+  // USER
+  let role = localStorage.getItem("role");
+  if (!role) {
+    role = confirm("Artist(Forte)로 접속할까요?") ? "artist" : "fan";
+    localStorage.setItem("role", role);
+  }
+
+  // POSTS
+  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+  function addPost() {
+    const text = postText.value.trim();
+    if (!text) return;
+    posts.unshift({ text, role, comments: [] });
+    localStorage.setItem("posts", JSON.stringify(posts));
+    postText.value = "";
+    renderPosts();
+  }
+
+  function renderPosts() {
+    postsEl = document.getElementById("posts");
+    postsEl.innerHTML = "";
+    posts.forEach((p, i) => {
+      postsEl.innerHTML += `
+        <div class="card">
+          <b>${p.role === "artist" ? "Forte" : "Fan"}
+            ${p.role === "artist" ? '<span class="badge">Artist</span>' : ""}
+          </b>
+          <p>${p.text}</p>
+          <input placeholder="Comment..." onkeydown="if(event.key==='Enter')addComment(${i}, this.value)">
+          ${p.comments.map(c => `<div class="comment">${c}</div>`).join("")}
+        </div>
+      `;
+    });
+  }
+
+  function addComment(i, text) {
+    if (!text) return;
+    posts[i].comments.push(text);
+    localStorage.setItem("posts", JSON.stringify(posts));
+    renderPosts();
+  }
+
+  // CHAT
+  const chats = JSON.parse(localStorage.getItem("chats") || "[]");
+
+  function openChat() {
+    go("chat");
+    renderChat();
+  }
+
+  function sendChat() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    chats.push({ text, role });
+    localStorage.setItem("chats", JSON.stringify(chats));
+    chatInput.value = "";
+    renderChat();
+  }
+
+  function renderChat() {
+    const box = document.getElementById("chatBox");
+    box.innerHTML = "";
+    chats.forEach(m => {
+      box.innerHTML += `<div class="msg ${m.role}">${m.text}</div>`;
+    });
+  }
+
+  // NAV
+  function go(id, btn) {
+    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+  }
+
+  renderPosts();
+  renderChat();
+</script>
+</body>
+</html>
