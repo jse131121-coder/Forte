@@ -4,193 +4,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FORTE</title>
-
 <style>
-*{box-sizing:border-box;font-family:Arial}
-body{margin:0;background:#000;color:#fff}
-.hidden{display:none}
-.center{
-  height:100vh;
+body{
+  margin:0;
+  background:black;
+  color:white;
+  font-family:Arial;
   display:flex;
-  flex-direction:column;
+  justify-content:center;
   align-items:center;
-  justify-content:center
+  height:100vh;
 }
-input,textarea,button{
-  width:80%;
-  max-width:400px;
-  background:#000;
-  color:#fff;
-  border:1px solid #fff;
+input,button{
+  display:block;
+  width:250px;
+  margin:10px auto;
   padding:10px;
-  margin:5px 0
-}
-nav{
-  display:flex;
-  justify-content:space-around;
-  border-bottom:1px solid #fff
-}
-.page{padding:10px}
-.post,.chat{border-bottom:1px solid #333;padding:8px}
-.chat.forte{text-align:left}
-.chat.artist{text-align:right}
-.date{
-  text-align:center;
-  font-size:12px;
-  opacity:.5;
-  margin:10px 0
+  background:black;
+  color:white;
+  border:1px solid white;
 }
 </style>
 </head>
-
 <body>
 
-<div id="loginScreen" class="center">
-  <h1>FORTE</h1>
-  <input id="login_id" placeholder="ID">
-  <input id="login_pw" type="password" placeholder="Password">
-  <button id="login_btn">LOGIN</button>
-</div>
-
-<div id="appScreen" class="hidden">
-
-<nav>
-  <button data-page="home">HOME</button>
-  <button data-page="community">COMMUNITY</button>
-  <button data-page="chat">CHAT</button>
-</nav>
-
-<section id="home" class="page">Welcome.</section>
-
-<section id="community" class="page hidden">
-  <textarea id="post_input" placeholder="Write..."></textarea>
-  <button id="post_btn">POST</button>
-  <div id="post_list"></div>
-</section>
-
-<section id="chat" class="page hidden">
-  <div id="chat_box"></div>
-  <textarea id="chat_input" placeholder="Message..."></textarea>
-  <button id="chat_btn">SEND</button>
-</section>
-
+<div id="box">
+  <h1 style="text-align:center">FORTE</h1>
+  <input id="uid" placeholder="ID">
+  <input id="upw" type="password" placeholder="Password">
+  <button onclick="login()">LOGIN</button>
+  <p id="result" style="text-align:center"></p>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+function login(){
+  const id = document.getElementById("uid").value;
+  const pw = document.getElementById("upw").value;
 
-  let currentUser = null;
-
-  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-  const chats = JSON.parse(localStorage.getItem("chats") || "[]");
-
-  const loginScreen = document.getElementById("loginScreen");
-  const appScreen = document.getElementById("appScreen");
-
-  document.getElementById("login_btn").onclick = () => {
-    const id = document.getElementById("login_id").value;
-    const pw = document.getElementById("login_pw").value;
-
-    if(id === "Artist" && pw === "Artist") currentUser = "Artist";
-    else if(id === "Forte" && pw === "01024773752") currentUser = "Forte";
-    else return alert("로그인 실패");
-
-    loginScreen.classList.add("hidden");
-    appScreen.classList.remove("hidden");
-    renderPosts();
-    renderChats();
-  };
-
-  document.querySelectorAll("nav button").forEach(btn=>{
-    btn.onclick = () => {
-      document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-      document.getElementById(btn.dataset.page).classList.remove("hidden");
-    };
-  });
-
-  /* 커뮤니티 */
-  document.getElementById("post_btn").onclick = () => {
-    const input = document.getElementById("post_input");
-    if(!input.value.trim()) return;
-
-    posts.push({ text: input.value, time: Date.now() });
-    localStorage.setItem("posts", JSON.stringify(posts));
-    input.value="";
-    renderPosts();
-  };
-
-  function renderPosts(){
-    const list = document.getElementById("post_list");
-    list.innerHTML="";
-    posts.forEach((p,i)=>{
-      const div=document.createElement("div");
-      div.className="post";
-      div.innerHTML = `
-        <pre>${p.text}</pre>
-        ${currentUser==="Forte"
-          ? `<button onclick="deletePost(${i})">삭제</button>`
-          : ""}
-      `;
-      list.appendChild(div);
-    });
+  if(id === "Artist" && pw === "Artist"){
+    document.body.innerHTML = "<h1>Artist 로그인 성공</h1>";
   }
-
-  window.deletePost = (i)=>{
-    posts.splice(i,1);
-    localStorage.setItem("posts", JSON.stringify(posts));
-    renderPosts();
-  };
-
-  /* 채팅 */
-  document.getElementById("chat_btn").onclick = () => {
-    const input=document.getElementById("chat_input");
-    if(!input.value.trim()) return;
-
-    chats.push({
-      text: input.value,
-      user: currentUser,
-      time: new Date().toDateString()
-    });
-    localStorage.setItem("chats", JSON.stringify(chats));
-    input.value="";
-    renderChats();
-  };
-
-  function renderChats(){
-    const box=document.getElementById("chat_box");
-    box.innerHTML="";
-    let lastDate="";
-
-    chats.forEach((c,i)=>{
-      if(c.time !== lastDate){
-        const d=document.createElement("div");
-        d.className="date";
-        d.innerText=c.time;
-        box.appendChild(d);
-        lastDate=c.time;
-      }
-
-      const div=document.createElement("div");
-      div.className=`chat ${c.user==="Forte"?"forte":"artist"}`;
-      div.innerHTML = `
-        ${c.user==="Forte" ? "Forte 🖤<br>" : ""}
-        <pre>${c.text}</pre>
-        ${currentUser==="Forte"
-          ? `<button onclick="deleteChat(${i})">삭제</button>`
-          : ""}
-      `;
-      box.appendChild(div);
-    });
+  else if(id === "Forte" && pw === "01024773752"){
+    document.body.innerHTML = "<h1>Forte 관리자 로그인 성공</h1>";
   }
-
-  window.deleteChat = (i)=>{
-    chats.splice(i,1);
-    localStorage.setItem("chats", JSON.stringify(chats));
-    renderChats();
-  };
-
-});
+  else{
+    document.getElementById("result").innerText = "로그인 실패";
+  }
+}
 </script>
 
 </body>
 </html>
+ 
