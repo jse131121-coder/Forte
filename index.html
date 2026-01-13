@@ -4,55 +4,205 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FORTE</title>
+
 <style>
-body{
-  margin:0;
-  background:black;
-  color:white;
-  font-family:Arial;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+*{box-sizing:border-box;font-family:Arial}
+body{margin:0;background:black;color:white}
+.hidden{display:none}
+
+.center{
   height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center
 }
-input,button{
-  display:block;
-  width:250px;
-  margin:10px auto;
-  padding:10px;
+
+input,textarea,button{
+  width:80%;
+  max-width:400px;
   background:black;
   color:white;
   border:1px solid white;
+  padding:10px;
+  margin:5px 0
 }
+
+nav{
+  display:flex;
+  justify-content:space-around;
+  border-bottom:1px solid white;
+  padding:10px 0
+}
+
+.page{padding:10px}
+.post,.chat{border-bottom:1px solid #333;padding:8px}
+.chat.forte{text-align:left}
+.chat.artist{text-align:right}
+.date{
+  text-align:center;
+  font-size:12px;
+  opacity:.5;
+  margin:10px 0
+}
+pre{white-space:pre-wrap}
 </style>
 </head>
+
 <body>
 
-<div id="box">
-  <h1 style="text-align:center">FORTE</h1>
+<!-- 로그인 -->
+<div id="loginScreen" class="center">
+  <h1>FORTE</h1>
   <input id="uid" placeholder="ID">
   <input id="upw" type="password" placeholder="Password">
   <button onclick="login()">LOGIN</button>
-  <p id="result" style="text-align:center"></p>
+</div>
+
+<!-- 앱 -->
+<div id="app" class="hidden">
+
+<nav>
+  <button onclick="show('home')">HOME</button>
+  <button onclick="show('community')">COMMUNITY</button>
+  <button onclick="show('chat')">CHAT</button>
+</nav>
+
+<section id="home" class="page">
+  Welcome to FORTE.
+</section>
+
+<section id="community" class="page hidden">
+  <textarea id="postInput" placeholder="Write... (줄바꿈 가능)"></textarea>
+  <button onclick="addPost()">POST</button>
+  <div id="postList"></div>
+</section>
+
+<section id="chat" class="page hidden">
+  <div id="chatBox"></div>
+  <textarea id="chatInput" placeholder="Message... (줄바꿈 가능)"></textarea>
+  <button onclick="sendChat()">SEND</button>
+</section>
+
 </div>
 
 <script>
+let currentUser = null;
+
+/* 데이터 */
+let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+
+/* 로그인 */
 function login(){
   const id = document.getElementById("uid").value;
   const pw = document.getElementById("upw").value;
 
-  if(id === "Artist" && pw === "Artist"){
-    document.body.innerHTML = "<h1>Artist 로그인 성공</h1>";
-  }
-  else if(id === "Forte" && pw === "01024773752"){
-    document.body.innerHTML = "<h1>Forte 관리자 로그인 성공</h1>";
-  }
-  else{
-    document.getElementById("result").innerText = "로그인 실패";
-  }
+  if(id==="Artist" && pw==="Artist") currentUser="Artist";
+  else if(id==="Forte" && pw==="01024773752") currentUser="Forte";
+  else return alert("로그인 실패");
+
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+
+  renderPosts();
+  renderChats();
+}
+
+/* 페이지 전환 */
+function show(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+}
+
+/* 커뮤니티 */
+function addPost(){
+  const input = document.getElementById("postInput");
+  if(!input.value.trim()) return;
+
+  posts.push({
+    text: input.value,
+    time: Date.now()
+  });
+
+  localStorage.setItem("posts", JSON.stringify(posts));
+  input.value="";
+  renderPosts();
+}
+
+function renderPosts(){
+  const list = document.getElementById("postList");
+  list.innerHTML="";
+  posts.forEach((p,i)=>{
+    const div=document.createElement("div");
+    div.className="post";
+    div.innerHTML=`
+      <pre>${p.text}</pre>
+      ${currentUser==="Forte"
+        ? `<button onclick="deletePost(${i})">삭제</button>`
+        : ""}
+    `;
+    list.appendChild(div);
+  });
+}
+
+function deletePost(i){
+  posts.splice(i,1);
+  localStorage.setItem("posts", JSON.stringify(posts));
+  renderPosts();
+}
+
+/* 채팅 */
+function sendChat(){
+  const input = document.getElementById("chatInput");
+  if(!input.value.trim()) return;
+
+  chats.push({
+    user: currentUser,
+    text: input.value,
+    date: new Date().toDateString()
+  });
+
+  localStorage.setItem("chats", JSON.stringify(chats));
+  input.value="";
+  renderChats();
+}
+
+function renderChats(){
+  const box = document.getElementById("chatBox");
+  box.innerHTML="";
+  let lastDate="";
+
+  chats.forEach((c,i)=>{
+    if(c.date !== lastDate){
+      const d=document.createElement("div");
+      d.className="date";
+      d.innerText=c.date;
+      box.appendChild(d);
+      lastDate=c.date;
+    }
+
+    const div=document.createElement("div");
+    div.className=`chat ${c.user==="Forte"?"forte":"artist"}`;
+    div.innerHTML=`
+      ${c.user==="Forte" ? "Forte 🖤<br>" : ""}
+      <pre>${c.text}</pre>
+      ${currentUser==="Forte"
+        ? `<button onclick="deleteChat(${i})">삭제</button>`
+        : ""}
+    `;
+    box.appendChild(div);
+  });
+}
+
+function deleteChat(i){
+  chats.splice(i,1);
+  localStorage.setItem("chats", JSON.stringify(chats));
+  renderChats();
 }
 </script>
 
 </body>
 </html>
+
  
