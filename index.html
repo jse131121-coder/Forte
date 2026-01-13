@@ -3,23 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A</title>
+<title>FORTE</title>
 
 <style>
 *{box-sizing:border-box;font-family:Arial}
 body{margin:0;background:#000;color:#fff}
 .hidden{display:none}
 .center{
-  height:100vh;display:flex;
+  height:100vh;
+  display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center
 }
 input,textarea,button{
-  width:80%;max-width:400px;
-  background:#000;color:#fff;
+  width:80%;
+  max-width:400px;
+  background:#000;
+  color:#fff;
   border:1px solid #fff;
-  padding:10px;margin:5px 0
+  padding:10px;
+  margin:5px 0
 }
 nav{
   display:flex;
@@ -41,151 +45,151 @@ nav{
 
 <body>
 
-<!-- 로그인 -->
 <div id="loginScreen" class="center">
-  <h1>A</h1>
-  <input id="loginId" placeholder="ID">
-  <input id="loginPw" type="password" placeholder="Password">
-  <button onclick="doLogin()">LOGIN</button>
+  <h1>FORTE</h1>
+  <input id="login_id" placeholder="ID">
+  <input id="login_pw" type="password" placeholder="Password">
+  <button id="login_btn">LOGIN</button>
 </div>
 
-<!-- 앱 -->
-<div id="app" class="hidden">
+<div id="appScreen" class="hidden">
 
 <nav>
-  <button onclick="showPage('home')">HOME</button>
-  <button onclick="showPage('community')">COMMUNITY</button>
-  <button onclick="showPage('chat')">CHAT</button>
+  <button data-page="home">HOME</button>
+  <button data-page="community">COMMUNITY</button>
+  <button data-page="chat">CHAT</button>
 </nav>
 
 <section id="home" class="page">Welcome.</section>
 
 <section id="community" class="page hidden">
-  <textarea id="postInput" placeholder="Write..."></textarea>
-  <button onclick="addPost()">POST</button>
-  <div id="postList"></div>
+  <textarea id="post_input" placeholder="Write..."></textarea>
+  <button id="post_btn">POST</button>
+  <div id="post_list"></div>
 </section>
 
 <section id="chat" class="page hidden">
-  <div id="chatBox"></div>
-  <textarea id="chatInput" placeholder="Message..."></textarea>
-  <button onclick="sendChat()">SEND</button>
+  <div id="chat_box"></div>
+  <textarea id="chat_input" placeholder="Message..."></textarea>
+  <button id="chat_btn">SEND</button>
 </section>
 
 </div>
 
 <script>
-let currentUser = null;
+document.addEventListener("DOMContentLoaded", () => {
 
-const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-const chats = JSON.parse(localStorage.getItem("chats") || "[]");
+  let currentUser = null;
 
-/* 로그인 */
-function doLogin(){
-  const id = document.getElementById("loginId").value;
-  const pw = document.getElementById("loginPw").value;
+  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
+  const chats = JSON.parse(localStorage.getItem("chats") || "[]");
 
-  if(id==="Artist" && pw==="Artist") currentUser="Artist";
-  else if(id==="Forte" && pw==="01024773752") currentUser="Forte";
-  else return alert("로그인 실패");
+  const loginScreen = document.getElementById("loginScreen");
+  const appScreen = document.getElementById("appScreen");
 
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  renderPosts();
-  renderChats();
-}
+  document.getElementById("login_btn").onclick = () => {
+    const id = document.getElementById("login_id").value;
+    const pw = document.getElementById("login_pw").value;
 
-/* 페이지 전환 */
-function showPage(page){
-  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-  document.getElementById(page).classList.remove("hidden");
-}
+    if(id === "Artist" && pw === "Artist") currentUser = "Artist";
+    else if(id === "Forte" && pw === "01024773752") currentUser = "Forte";
+    else return alert("로그인 실패");
 
-/* 커뮤니티 */
-function addPost(){
-  const input = document.getElementById("postInput");
-  if(!input.value.trim()) return;
-
-  const post = { text: input.value, time: Date.now() };
-  posts.push(post);
-  localStorage.setItem("posts", JSON.stringify(posts));
-  renderPosts();
-  input.value="";
-}
-
-function renderPosts(){
-  const list = document.getElementById("postList");
-  list.innerHTML="";
-  posts.forEach((p,i)=>{
-    const div=document.createElement("div");
-    div.className="post";
-    div.innerHTML=`
-      <pre>${p.text}</pre>
-      ${currentUser==="Forte"
-        ? `<button onclick="deletePost(${i})">삭제</button>`
-        : ""}
-    `;
-    list.appendChild(div);
-  });
-}
-
-function deletePost(i){
-  posts.splice(i,1);
-  localStorage.setItem("posts", JSON.stringify(posts));
-  renderPosts();
-}
-
-/* 채팅 */
-let lastDate="";
-
-function sendChat(){
-  const input=document.getElementById("chatInput");
-  if(!input.value.trim()) return;
-
-  const chat={
-    text:input.value,
-    user:currentUser,
-    time:new Date()
+    loginScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
+    renderPosts();
+    renderChats();
   };
-  chats.push(chat);
-  localStorage.setItem("chats", JSON.stringify(chats));
-  renderChats();
-  input.value="";
-}
 
-function renderChats(){
-  const box=document.getElementById("chatBox");
-  box.innerHTML="";
-  lastDate="";
-
-  chats.forEach((c,i)=>{
-    const d=c.time.toDateString();
-    if(d!==lastDate){
-      const dateDiv=document.createElement("div");
-      dateDiv.className="date";
-      dateDiv.innerText=d;
-      box.appendChild(dateDiv);
-      lastDate=d;
-    }
-
-    const div=document.createElement("div");
-    div.className=`chat ${c.user==="Forte"?"forte":"artist"}`;
-    div.innerHTML=`
-      ${c.user==="Forte"?"Forte 🖤<br>":""}
-      <pre>${c.text}</pre>
-      ${currentUser==="Forte"
-        ? `<button onclick="deleteChat(${i})">삭제</button>`
-        : ""}
-    `;
-    box.appendChild(div);
+  document.querySelectorAll("nav button").forEach(btn=>{
+    btn.onclick = () => {
+      document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+      document.getElementById(btn.dataset.page).classList.remove("hidden");
+    };
   });
-}
 
-function deleteChat(i){
-  chats.splice(i,1);
-  localStorage.setItem("chats", JSON.stringify(chats));
-  renderChats();
-}
+  /* 커뮤니티 */
+  document.getElementById("post_btn").onclick = () => {
+    const input = document.getElementById("post_input");
+    if(!input.value.trim()) return;
+
+    posts.push({ text: input.value, time: Date.now() });
+    localStorage.setItem("posts", JSON.stringify(posts));
+    input.value="";
+    renderPosts();
+  };
+
+  function renderPosts(){
+    const list = document.getElementById("post_list");
+    list.innerHTML="";
+    posts.forEach((p,i)=>{
+      const div=document.createElement("div");
+      div.className="post";
+      div.innerHTML = `
+        <pre>${p.text}</pre>
+        ${currentUser==="Forte"
+          ? `<button onclick="deletePost(${i})">삭제</button>`
+          : ""}
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  window.deletePost = (i)=>{
+    posts.splice(i,1);
+    localStorage.setItem("posts", JSON.stringify(posts));
+    renderPosts();
+  };
+
+  /* 채팅 */
+  document.getElementById("chat_btn").onclick = () => {
+    const input=document.getElementById("chat_input");
+    if(!input.value.trim()) return;
+
+    chats.push({
+      text: input.value,
+      user: currentUser,
+      time: new Date().toDateString()
+    });
+    localStorage.setItem("chats", JSON.stringify(chats));
+    input.value="";
+    renderChats();
+  };
+
+  function renderChats(){
+    const box=document.getElementById("chat_box");
+    box.innerHTML="";
+    let lastDate="";
+
+    chats.forEach((c,i)=>{
+      if(c.time !== lastDate){
+        const d=document.createElement("div");
+        d.className="date";
+        d.innerText=c.time;
+        box.appendChild(d);
+        lastDate=c.time;
+      }
+
+      const div=document.createElement("div");
+      div.className=`chat ${c.user==="Forte"?"forte":"artist"}`;
+      div.innerHTML = `
+        ${c.user==="Forte" ? "Forte 🖤<br>" : ""}
+        <pre>${c.text}</pre>
+        ${currentUser==="Forte"
+          ? `<button onclick="deleteChat(${i})">삭제</button>`
+          : ""}
+      `;
+      box.appendChild(div);
+    });
+  }
+
+  window.deleteChat = (i)=>{
+    chats.splice(i,1);
+    localStorage.setItem("chats", JSON.stringify(chats));
+    renderChats();
+  };
+
+});
 </script>
 
 </body>
