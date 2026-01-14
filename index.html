@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FORTE</title>
 
 <style>
@@ -10,78 +10,32 @@
   --bg:#000; --card:#111; --text:#fff; --sub:#aaa; --line:#222;
 }
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  display:flex;justify-content:center;
-}
-.app{
-  width:100%;max-width:420px;min-height:100vh;
-  border-left:1px solid var(--line);
-  border-right:1px solid var(--line);
-}
-header{
-  padding:16px;text-align:center;
-  border-bottom:1px solid var(--line);
-  letter-spacing:2px;font-weight:600;
-}
+body{margin:0;background:#000;color:#fff;display:flex;justify-content:center;}
+.app{width:100%;max-width:420px;min-height:100vh;border-left:1px solid #222;border-right:1px solid #222;}
+header{padding:16px;text-align:center;border-bottom:1px solid #222;letter-spacing:2px;}
 section{display:none;padding:16px;padding-bottom:90px;}
 section.active{display:block;}
-nav{
-  position:fixed;bottom:0;width:100%;max-width:420px;
-  display:flex;border-top:1px solid var(--line);background:#000;
-}
-nav button{
-  flex:1;padding:14px 0;background:none;border:none;
-  color:var(--sub);font-size:12px;
-}
-nav button.active{color:var(--text);}
-.card{
-  background:var(--card);border:1px solid var(--line);
-  border-radius:12px;padding:14px;margin-bottom:12px;
-}
-.badge{
-  font-size:10px;border:1px solid #fff;
-  padding:2px 6px;border-radius:999px;margin-left:6px;
-}
-input,textarea{
-  width:100%;background:#000;color:#fff;
-  border:1px solid var(--line);border-radius:8px;
-  padding:10px;margin-bottom:8px;
-}
-textarea{resize:none;min-height:80px;}
-button.primary{
-  width:100%;background:#fff;color:#000;
-  border:none;border-radius:8px;
-  padding:12px;font-weight:600;
-}
-.comment{
-  border-top:1px solid var(--line);
-  padding-top:6px;margin-top:6px;font-size:14px;
-  white-space:pre-wrap;
-}
-.chat-box{display:flex;flex-direction:column;gap:6px;}
-.msg{
-  max-width:70%;padding:8px 12px;
-  border-radius:12px;font-size:14px;
-  white-space:pre-wrap;
-}
-.fan{background:#fff;color:#000;align-self:flex-end;}
-.artist{background:#111;align-self:flex-start;}
-.center{color:var(--sub);text-align:center;margin-top:40px;}
-.danger{
-  background:none;color:#fff;border:1px solid #fff;
-  padding:10px;border-radius:8px;
-}
-
-/* LOGIN MODAL */
-.modal{
-  position:fixed;inset:0;background:#000;
-  display:flex;align-items:center;justify-content:center;z-index:999;
-}
-.modal-box{
-  width:90%;max-width:320px;border:1px solid var(--line);
-  border-radius:12px;padding:20px;background:#000;
-}
+nav{position:fixed;bottom:0;width:100%;max-width:420px;display:flex;border-top:1px solid #222;background:#000;}
+nav button{flex:1;padding:14px 0;background:none;border:none;color:#aaa;font-size:12px;}
+nav button.active{color:#fff;}
+.card{background:#111;border:1px solid #222;border-radius:12px;padding:14px;margin-bottom:12px;}
+input,textarea{width:100%;background:#000;color:#fff;border:1px solid #222;border-radius:8px;padding:10px;margin-bottom:8px;}
+textarea{resize:none;}
+button.primary{width:100%;background:#fff;color:#000;border:none;border-radius:8px;padding:12px;font-weight:600;}
+.chat-box{display:flex;flex-direction:column;gap:10px;}
+.msg-wrap{max-width:75%;}
+.msg-name{font-size:11px;color:#aaa;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;}
+.msg{padding:10px 14px;border-radius:14px;white-space:pre-wrap;}
+.fan{align-self:flex-end;}
+.fan .msg{background:#fff;color:#000;}
+.artist{align-self:flex-start;}
+.artist .msg{background:#111;border:1px solid #222;}
+.center{text-align:center;color:#aaa;margin-top:40px;}
+.modal{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal-box{width:90%;max-width:320px;border:1px solid #222;border-radius:12px;padding:20px;background:#000;}
+.hidden{display:none;}
+.small{font-size:12px;color:#aaa;}
 </style>
 </head>
 
@@ -97,15 +51,33 @@ button.primary{
   </div>
 </div>
 
-<div class="app" id="app" style="display:none;">
+<!-- PROFILE MODAL -->
+<div class="modal hidden" id="profileModal">
+  <div class="modal-box">
+    <h3>Forte Profile</h3>
+    <input id="pfName" placeholder="Name">
+    <input id="pfAvatar" placeholder="Avatar URL">
+    <textarea id="pfBio" placeholder="Bio"></textarea>
+    <button class="primary" onclick="saveProfile()">SAVE</button>
+  </div>
+</div>
+
+<!-- ACCOUNT MODAL -->
+<div class="modal hidden" id="accountModal">
+  <div class="modal-box">
+    <h3>Add Account</h3>
+    <input id="newId" placeholder="New ID">
+    <input id="newPw" placeholder="New Password">
+    <button class="primary" onclick="addAccount()">ADD</button>
+  </div>
+</div>
+
+<div class="app hidden" id="app">
 <header>FORTE</header>
 
 <section id="home" class="active">
-  <div class="center">
-    Forte Official Fan Space<br/><br/>
-    BLACK & WHITE
-  </div>
-  <div id="resetArea"></div>
+  <div class="center">Forte Official Fan Space</div>
+  <div id="adminTools"></div>
 </section>
 
 <section id="community">
@@ -122,7 +94,7 @@ button.primary{
 
 <section id="chat">
   <div class="chat-box" id="chatBox"></div>
-  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter = Send)"></textarea>
+  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter)"></textarea>
   <button class="primary" onclick="sendChat()">SEND</button>
 </section>
 
@@ -134,130 +106,117 @@ button.primary{
 </div>
 
 <script>
-/* ===== GLOBAL ===== */
-let role = null;
-const postsEl = document.getElementById("posts");
-const chatBox = document.getElementById("chatBox");
+/* ===== DATA ===== */
+let role=null;
+let accounts=JSON.parse(localStorage.getItem("accounts")||`{"Artist":"Artist","Forte":"01024773752"}`);
+let profile=JSON.parse(localStorage.getItem("profile")||`{"name":"Forte","avatar":"","bio":""}`);
+let chats=JSON.parse(localStorage.getItem("chats")||"[]");
+let posts=JSON.parse(localStorage.getItem("posts")||"[]");
 
 /* ===== LOGIN ===== */
 function login(){
-  const id = loginId.value.trim();
-  const pw = loginPw.value.trim();
-
-  if(id==="Artist" && pw==="Artist"){
-    role="fan";
-  }else if(id==="Forte" && pw==="01024773752"){
-    role="artist";
-  }else{
-    alert("로그인 정보가 틀렸어요.");
-    return;
-  }
-
-  localStorage.setItem("role",role);
-  loginModal.style.display="none";
-  app.style.display="block";
+  const id=loginId.value.trim();
+  const pw=loginPw.value.trim();
+  if(accounts[id]!==pw){alert("로그인 실패");return;}
+  role=(id==="Forte")?"artist":"fan";
+  loginModal.classList.add("hidden");
+  app.classList.remove("hidden");
   init();
 }
 
 /* ===== INIT ===== */
 function init(){
   if(role==="artist"){
-    resetArea.innerHTML =
-      `<button class="danger" onclick="resetSite()">⚠ 사이트 초기화</button>`;
+    adminTools.innerHTML=`
+      <button class="primary" onclick="openProfile()">프로필 수정</button><br><br>
+      <button class="primary" onclick="openAccount()">계정 추가</button>
+    `;
   }
-  renderPosts();
+  renderChat(); renderPosts();
+}
+
+/* ===== PROFILE ===== */
+function openProfile(){
+  pfName.value=profile.name;
+  pfAvatar.value=profile.avatar;
+  pfBio.value=profile.bio;
+  profileModal.classList.remove("hidden");
+}
+function saveProfile(){
+  profile={name:pfName.value,avatar:pfAvatar.value,bio:pfBio.value};
+  localStorage.setItem("profile",JSON.stringify(profile));
+  profileModal.classList.add("hidden");
   renderChat();
 }
 
-/* ===== RESET ===== */
-function resetSite(){
-  if(!confirm("모든 내용이 삭제됩니다.")) return;
-  localStorage.removeItem("posts");
-  localStorage.removeItem("chats");
-  location.reload();
-}
-
-/* ===== COMMUNITY ===== */
-let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-
-function addPost(){
-  const t = postText.value.trim();
-  if(!t) return;
-  posts.unshift({text:t,role,comments:[]});
-  postText.value="";
-  savePosts();
-}
-
-function addComment(i,val){
-  if(!val.trim()) return;
-  posts[i].comments.push(val);
-  savePosts();
-}
-
-function savePosts(){
-  localStorage.setItem("posts",JSON.stringify(posts));
-  renderPosts();
-}
-
-function renderPosts(){
-  postsEl.innerHTML="";
-  posts.forEach((p,i)=>{
-    postsEl.innerHTML += `
-      <div class="card">
-        <b>${p.role==="artist"?"Forte":"Fan"}
-        ${p.role==="artist"?'<span class="badge">Artist</span>':""}</b>
-        <p style="white-space:pre-wrap;">${p.text}</p>
-        <textarea placeholder="Comment..."
-          onkeydown="if(event.key==='Enter'&&event.ctrlKey)addComment(${i},this.value)"></textarea>
-        ${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}
-      </div>
-    `;
-  });
+/* ===== ACCOUNT ===== */
+function openAccount(){accountModal.classList.remove("hidden");}
+function addAccount(){
+  accounts[newId.value]=newPw.value;
+  localStorage.setItem("accounts",JSON.stringify(accounts));
+  accountModal.classList.add("hidden");
 }
 
 /* ===== CHAT ===== */
-let chats = JSON.parse(localStorage.getItem("chats") || "[]");
-
-function openChat(){
-  go("chat");
-  renderChat();
-}
-
+function openChat(){go("chat");renderChat();}
 function sendChat(){
-  const t = chatInput.value.trim();
-  if(!t) return;
-  chats.push({text:t,role});
+  if(!chatInput.value.trim())return;
+  chats.push({text:chatInput.value,role});
   chatInput.value="";
   localStorage.setItem("chats",JSON.stringify(chats));
   renderChat();
 }
-
-chatInput.addEventListener("keydown",e=>{
-  if(e.ctrlKey && e.key==="Enter") sendChat();
-});
-
 function renderChat(){
   chatBox.innerHTML="";
   chats.forEach(m=>{
-    chatBox.innerHTML +=
-      `<div class="msg ${m.role}">${m.text}</div>`;
+    if(m.role==="artist"){
+      chatBox.innerHTML+=`
+        <div class="msg-wrap artist">
+          <div class="msg-name">
+            ${profile.avatar?`<img class="avatar" src="${profile.avatar}">`:""}
+            ${profile.name}
+          </div>
+          <div class="msg">${m.text}</div>
+        </div>`;
+    }else{
+      chatBox.innerHTML+=`
+        <div class="msg-wrap fan">
+          <div class="msg">${m.text}</div>
+        </div>`;
+    }
+  });
+}
+chatInput.addEventListener("keydown",e=>{
+  if(e.ctrlKey&&e.key==="Enter")sendChat();
+});
+
+/* ===== COMMUNITY (기존 유지) ===== */
+function addPost(){
+  if(!postText.value.trim())return;
+  posts.unshift({text:postText.value,role,comments:[]});
+  postText.value="";
+  localStorage.setItem("posts",JSON.stringify(posts));
+  renderPosts();
+}
+function renderPosts(){
+  postsEl.innerHTML="";
+  posts.forEach(p=>{
+    postsEl.innerHTML+=`<div class="card">${p.text}</div>`;
   });
 }
 
 /* ===== NAV ===== */
 function go(id,btn){
-  document.querySelectorAll("section")
-    .forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-
-  document.querySelectorAll("nav button")
-    .forEach(b=>b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
 }
 </script>
 
 </body>
 </html>
+
 
 
 
