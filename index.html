@@ -7,35 +7,35 @@
 
 <style>
 :root{
-  --bg:#000; --card:#111; --text:#fff; --sub:#aaa; --line:#222;
+  --bg:#fff; --card:#f5f5f5; --text:#000; --sub:#666; --line:#ddd;
 }
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
-body{margin:0;background:#000;color:#fff;display:flex;justify-content:center;}
-.app{width:100%;max-width:420px;min-height:100vh;border-left:1px solid #222;border-right:1px solid #222;}
-header{padding:16px;text-align:center;border-bottom:1px solid #222;letter-spacing:2px;}
+body{margin:0;background:var(--bg);color:var(--text);display:flex;justify-content:center;}
+.app{width:100%;max-width:420px;min-height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line);}
+header{padding:16px;text-align:center;border-bottom:1px solid var(--line);letter-spacing:2px;}
 section{display:none;padding:16px;padding-bottom:90px;}
 section.active{display:block;}
-nav{position:fixed;bottom:0;width:100%;max-width:420px;display:flex;border-top:1px solid #222;background:#000;}
-nav button{flex:1;padding:14px 0;background:none;border:none;color:#aaa;font-size:12px;}
-nav button.active{color:#fff;}
-.card{background:#111;border:1px solid #222;border-radius:12px;padding:14px;margin-bottom:12px;}
-input,textarea{width:100%;background:#000;color:#fff;border:1px solid #222;border-radius:8px;padding:10px;margin-bottom:8px;}
+nav{position:fixed;bottom:0;width:100%;max-width:420px;display:flex;border-top:1px solid var(--line);background:#fff;}
+nav button{flex:1;padding:14px 0;background:none;border:none;color:var(--sub);font-size:12px;}
+nav button.active{color:var(--text);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+input,textarea{width:100%;background:#fff;color:#000;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;}
 textarea{resize:none;}
-button.primary{width:100%;background:#fff;color:#000;border:none;border-radius:8px;padding:12px;font-weight:600;}
+button.primary{width:100%;background:#000;color:#fff;border:none;border-radius:8px;padding:12px;font-weight:600;}
 .chat-box{display:flex;flex-direction:column;gap:10px;}
 .msg-wrap{max-width:75%;}
-.msg-name{font-size:11px;color:#aaa;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.msg-name{font-size:11px;color:var(--sub);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
 .avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;}
 .msg{padding:10px 14px;border-radius:14px;white-space:pre-wrap;}
 .fan{align-self:flex-end;}
-.fan .msg{background:#fff;color:#000;}
+.fan .msg{background:#000;color:#fff;}
 .artist{align-self:flex-start;}
-.artist .msg{background:#111;border:1px solid #222;}
-.center{text-align:center;color:#aaa;margin-top:40px;}
-.modal{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:999;}
-.modal-box{width:90%;max-width:320px;border:1px solid #222;border-radius:12px;padding:20px;background:#000;}
+.artist .msg{background:#fff;border:1px solid var(--line);}
+.center{text-align:center;color:var(--sub);margin-top:40px;}
+.modal{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal-box{width:90%;max-width:320px;border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff;}
 .hidden{display:none;}
-.small{font-size:12px;color:#aaa;}
+.small{font-size:12px;color:var(--sub);}
 </style>
 </head>
 
@@ -56,7 +56,7 @@ button.primary{width:100%;background:#fff;color:#000;border:none;border-radius:8
   <div class="modal-box">
     <h3>Forte Profile</h3>
     <input id="pfName" placeholder="Name">
-    <input id="pfAvatar" placeholder="Avatar URL">
+    <input type="file" id="pfAvatarFile" accept="image/*">
     <textarea id="pfBio" placeholder="Bio"></textarea>
     <button class="primary" onclick="saveProfile()">SAVE</button>
   </div>
@@ -112,13 +112,12 @@ let accounts=JSON.parse(localStorage.getItem("accounts")||`{"Artist":"Artist","F
 let profile=JSON.parse(localStorage.getItem("profile")||`{"name":"Forte","avatar":"","bio":""}`);
 let chats=JSON.parse(localStorage.getItem("chats")||"[]");
 let posts=JSON.parse(localStorage.getItem("posts")||"[]");
+const postsEl=document.getElementById("posts");
 
 /* ===== LOGIN ===== */
 function login(){
-  const id=loginId.value.trim();
-  const pw=loginPw.value.trim();
-  if(accounts[id]!==pw){alert("로그인 실패");return;}
-  role=(id==="Forte")?"artist":"fan";
+  if(accounts[loginId.value]!==loginPw.value){alert("로그인 실패");return;}
+  role=(loginId.value==="Forte")?"artist":"fan";
   loginModal.classList.add("hidden");
   app.classList.remove("hidden");
   init();
@@ -135,18 +134,32 @@ function init(){
   renderChat(); renderPosts();
 }
 
-/* ===== PROFILE ===== */
+/* ===== PROFILE (업로드) ===== */
 function openProfile(){
   pfName.value=profile.name;
-  pfAvatar.value=profile.avatar;
   pfBio.value=profile.bio;
   profileModal.classList.remove("hidden");
 }
+
 function saveProfile(){
-  profile={name:pfName.value,avatar:pfAvatar.value,bio:pfBio.value};
-  localStorage.setItem("profile",JSON.stringify(profile));
-  profileModal.classList.add("hidden");
-  renderChat();
+  profile.name=pfName.value;
+  profile.bio=pfBio.value;
+
+  const file=pfAvatarFile.files[0];
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>{
+      profile.avatar=reader.result;
+      localStorage.setItem("profile",JSON.stringify(profile));
+      profileModal.classList.add("hidden");
+      renderChat();
+    };
+    reader.readAsDataURL(file);
+  }else{
+    localStorage.setItem("profile",JSON.stringify(profile));
+    profileModal.classList.add("hidden");
+    renderChat();
+  }
 }
 
 /* ===== ACCOUNT ===== */
@@ -180,9 +193,7 @@ function renderChat(){
         </div>`;
     }else{
       chatBox.innerHTML+=`
-        <div class="msg-wrap fan">
-          <div class="msg">${m.text}</div>
-        </div>`;
+        <div class="msg-wrap fan"><div class="msg">${m.text}</div></div>`;
     }
   });
 }
@@ -190,10 +201,10 @@ chatInput.addEventListener("keydown",e=>{
   if(e.ctrlKey&&e.key==="Enter")sendChat();
 });
 
-/* ===== COMMUNITY (기존 유지) ===== */
+/* ===== COMMUNITY ===== */
 function addPost(){
   if(!postText.value.trim())return;
-  posts.unshift({text:postText.value,role,comments:[]});
+  posts.unshift({text:postText.value});
   postText.value="";
   localStorage.setItem("posts",JSON.stringify(posts));
   renderPosts();
@@ -216,8 +227,3 @@ function go(id,btn){
 
 </body>
 </html>
-
-
-
-
- 
