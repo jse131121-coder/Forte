@@ -6,36 +6,145 @@
 <title>FORTE</title>
 
 <style>
-:root{
-  --bg:#fff; --card:#f5f5f5; --text:#000; --sub:#666; --line:#ddd;
+body{
+  margin:0;
+  background:#fff;
+  color:#000;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  display:flex;
+  justify-content:center;
 }
-*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
-body{margin:0;background:var(--bg);color:var(--text);display:flex;justify-content:center;}
-.app{width:100%;max-width:420px;min-height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line);}
-header{padding:16px;text-align:center;border-bottom:1px solid var(--line);letter-spacing:2px;}
-section{display:none;padding:16px;padding-bottom:90px;}
-section.active{display:block;}
-nav{position:fixed;bottom:0;width:100%;max-width:420px;display:flex;border-top:1px solid var(--line);background:#fff;}
-nav button{flex:1;padding:14px 0;background:none;border:none;color:var(--sub);font-size:12px;}
-nav button.active{color:var(--text);}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
-input,textarea{width:100%;background:#fff;color:#000;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;}
-textarea{resize:none;}
-button.primary{width:100%;background:#000;color:#fff;border:none;border-radius:8px;padding:12px;font-weight:600;}
-.chat-box{display:flex;flex-direction:column;gap:10px;}
-.msg-wrap{max-width:75%;}
-.msg-name{font-size:11px;color:var(--sub);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
-.avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;}
-.msg{padding:10px 14px;border-radius:14px;white-space:pre-wrap;}
-.fan{align-self:flex-end;}
-.fan .msg{background:#000;color:#fff;}
-.artist{align-self:flex-start;}
-.artist .msg{background:#fff;border:1px solid var(--line);}
-.center{text-align:center;color:var(--sub);margin-top:40px;}
-.modal{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;}
-.modal-box{width:90%;max-width:320px;border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff;}
-.hidden{display:none;}
-.small{font-size:12px;color:var(--sub);}
+.app{
+  width:100%;
+  max-width:420px;
+  min-height:100vh;
+  border-left:1px solid #ddd;
+  border-right:1px solid #ddd;
+}
+header{
+  padding:14px;
+  text-align:center;
+  border-bottom:1px solid #ddd;
+  font-weight:600;
+}
+section{
+  display:none;
+  padding:16px;
+  padding-bottom:90px;
+}
+section.active{display:block}
+nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  max-width:420px;
+  display:flex;
+  border-top:1px solid #ddd;
+  background:#fff;
+}
+nav button{
+  flex:1;
+  padding:12px 0;
+  background:none;
+  border:none;
+  font-size:12px;
+}
+nav button.active{font-weight:600}
+
+.card{
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:12px;
+}
+textarea,input{
+  width:100%;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+button.primary{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#000;
+  color:#fff;
+  font-weight:600;
+}
+button.sub{
+  width:100%;
+  padding:10px;
+  border:1px solid #000;
+  background:#fff;
+  margin-bottom:8px;
+}
+
+.chat-box{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.msg{
+  max-width:75%;
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:13px;
+  white-space:pre-wrap;
+}
+.fan{
+  background:#000;
+  color:#fff;
+  align-self:flex-end;
+}
+.artist{
+  background:#eee;
+  align-self:flex-start;
+}
+.artist-wrap{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+}
+.artist-wrap img{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.artist-name{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.date{
+  text-align:center;
+  font-size:11px;
+  color:#666;
+  margin:12px 0;
+}
+.admin-tools{
+  font-size:11px;
+  margin-top:6px;
+  display:flex;
+  gap:10px;
+}
+.pin{font-weight:600}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.modal-box{
+  width:90%;
+  max-width:320px;
+}
 </style>
 </head>
 
@@ -44,186 +153,188 @@ button.primary{width:100%;background:#000;color:#fff;border:none;border-radius:8
 <!-- LOGIN -->
 <div class="modal" id="loginModal">
   <div class="modal-box">
-    <h3 style="text-align:center;">LOGIN</h3>
+    <h3>LOGIN</h3>
     <input id="loginId" placeholder="ID">
     <input id="loginPw" type="password" placeholder="Password">
     <button class="primary" onclick="login()">ENTER</button>
   </div>
 </div>
 
-<!-- PROFILE MODAL -->
-<div class="modal hidden" id="profileModal">
-  <div class="modal-box">
-    <h3>Forte Profile</h3>
-    <input id="pfName" placeholder="Name">
-    <input type="file" id="pfAvatarFile" accept="image/*">
-    <textarea id="pfBio" placeholder="Bio"></textarea>
-    <button class="primary" onclick="saveProfile()">SAVE</button>
-  </div>
-</div>
+<div class="app" id="app" style="display:none">
+<header id="headerTitle">FORTE</header>
 
-<!-- ACCOUNT MODAL -->
-<div class="modal hidden" id="accountModal">
-  <div class="modal-box">
-    <h3>Add Account</h3>
-    <input id="newId" placeholder="New ID">
-    <input id="newPw" placeholder="New Password">
-    <button class="primary" onclick="addAccount()">ADD</button>
-  </div>
-</div>
-
-<div class="app hidden" id="app">
-<header>FORTE</header>
-
-<section id="home" class="active">
-  <div class="center">Forte Official Fan Space</div>
-  <div id="adminTools"></div>
-</section>
-
-<section id="community">
-  <div class="card">
-    <textarea id="postText" placeholder="Write something..."></textarea>
-    <button class="primary" onclick="addPost()">POST</button>
-  </div>
+<section id="community" class="active">
+  <textarea id="postText" placeholder="Write something..."></textarea>
+  <button class="primary" onclick="addPost()">POST</button>
   <div id="posts"></div>
-</section>
-
-<section id="chatlist">
-  <div class="card" onclick="openChat()">Forte (Artist)</div>
 </section>
 
 <section id="chat">
   <div class="chat-box" id="chatBox"></div>
-  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter)"></textarea>
+  <textarea id="chatInput" placeholder="Message..."></textarea>
   <button class="primary" onclick="sendChat()">SEND</button>
 </section>
 
+<section id="admin">
+  <div class="card">
+    <h4>Forte Profile</h4>
+    <input type="file" accept="image/*" onchange="uploadProfile(this)">
+  </div>
+  <div class="card">
+    <h4>Add Account</h4>
+    <input id="newId" placeholder="ID">
+    <input id="newPw" placeholder="Password">
+    <button class="sub" onclick="addAccount()">ADD</button>
+  </div>
+</section>
+
 <nav>
-  <button class="active" onclick="go('home',this)">HOME</button>
-  <button onclick="go('community',this)">COMMUNITY</button>
-  <button onclick="go('chatlist',this)">CHAT</button>
+  <button class="active" onclick="go('community',this)">COMMUNITY</button>
+  <button onclick="go('chat',this)">CHAT</button>
+  <button id="adminBtn" onclick="go('admin',this)">ADMIN</button>
 </nav>
 </div>
 
 <script>
-/* ===== DATA ===== */
+/* STATE */
 let role=null;
-let accounts=JSON.parse(localStorage.getItem("accounts")||`{"Artist":"Artist","Forte":"01024773752"}`);
-let profile=JSON.parse(localStorage.getItem("profile")||`{"name":"Forte","avatar":"","bio":""}`);
-let chats=JSON.parse(localStorage.getItem("chats")||"[]");
-let posts=JSON.parse(localStorage.getItem("posts")||"[]");
-const postsEl=document.getElementById("posts");
+let accounts=JSON.parse(localStorage.getItem("accounts"))||[
+  {id:"Artist",pw:"Artist",role:"fan"},
+  {id:"Forte",pw:"01024773752",role:"artist"}
+];
+let posts=JSON.parse(localStorage.getItem("posts"))||[];
+let chats=JSON.parse(localStorage.getItem("chats"))||[];
+let profileImg=localStorage.getItem("profileImg")||"";
 
-/* ===== LOGIN ===== */
+/* LOGIN */
 function login(){
-  if(accounts[loginId.value]!==loginPw.value){alert("로그인 실패");return;}
-  role=(loginId.value==="Forte")?"artist":"fan";
-  loginModal.classList.add("hidden");
-  app.classList.remove("hidden");
-  init();
+  const id=loginId.value.trim();
+  const pw=loginPw.value.trim();
+  const acc=accounts.find(a=>a.id===id && a.pw===pw);
+  if(!acc){alert("로그인 실패");return;}
+  role=acc.role;
+  loginModal.style.display="none";
+  app.style.display="block";
+  if(role!=="artist") adminBtn.style.display="none";
+  renderPosts(); renderChat();
 }
 
-/* ===== INIT ===== */
-function init(){
-  if(role==="artist"){
-    adminTools.innerHTML=`
-      <button class="primary" onclick="openProfile()">프로필 수정</button><br><br>
-      <button class="primary" onclick="openAccount()">계정 추가</button>
-    `;
-  }
-  renderChat(); renderPosts();
-}
-
-/* ===== PROFILE (업로드) ===== */
-function openProfile(){
-  pfName.value=profile.name;
-  pfBio.value=profile.bio;
-  profileModal.classList.remove("hidden");
-}
-
-function saveProfile(){
-  profile.name=pfName.value;
-  profile.bio=pfBio.value;
-
-  const file=pfAvatarFile.files[0];
-  if(file){
-    const reader=new FileReader();
-    reader.onload=()=>{
-      profile.avatar=reader.result;
-      localStorage.setItem("profile",JSON.stringify(profile));
-      profileModal.classList.add("hidden");
-      renderChat();
-    };
-    reader.readAsDataURL(file);
-  }else{
-    localStorage.setItem("profile",JSON.stringify(profile));
-    profileModal.classList.add("hidden");
-    renderChat();
-  }
-}
-
-/* ===== ACCOUNT ===== */
-function openAccount(){accountModal.classList.remove("hidden");}
+/* ACCOUNTS */
 function addAccount(){
-  accounts[newId.value]=newPw.value;
+  accounts.push({id:newId.value,pw:newPw.value,role:"fan"});
   localStorage.setItem("accounts",JSON.stringify(accounts));
-  accountModal.classList.add("hidden");
+  alert("계정 추가됨");
+  newId.value=""; newPw.value="";
 }
 
-/* ===== CHAT ===== */
-function openChat(){go("chat");renderChat();}
-function sendChat(){
-  if(!chatInput.value.trim())return;
-  chats.push({text:chatInput.value,role});
-  chatInput.value="";
-  localStorage.setItem("chats",JSON.stringify(chats));
-  renderChat();
+/* PROFILE */
+function uploadProfile(input){
+  const file=input.files[0];
+  const reader=new FileReader();
+  reader.onload=()=>{
+    profileImg=reader.result;
+    localStorage.setItem("profileImg",profileImg);
+    alert("프로필 저장됨");
+    renderChat();
+  };
+  reader.readAsDataURL(file);
 }
-function renderChat(){
-  chatBox.innerHTML="";
-  chats.forEach(m=>{
-    if(m.role==="artist"){
-      chatBox.innerHTML+=`
-        <div class="msg-wrap artist">
-          <div class="msg-name">
-            ${profile.avatar?`<img class="avatar" src="${profile.avatar}">`:""}
-            ${profile.name}
-          </div>
-          <div class="msg">${m.text}</div>
-        </div>`;
-    }else{
-      chatBox.innerHTML+=`
-        <div class="msg-wrap fan"><div class="msg">${m.text}</div></div>`;
-    }
-  });
-}
-chatInput.addEventListener("keydown",e=>{
-  if(e.ctrlKey&&e.key==="Enter")sendChat();
-});
 
-/* ===== COMMUNITY ===== */
+/* COMMUNITY */
 function addPost(){
-  if(!postText.value.trim())return;
-  posts.unshift({text:postText.value});
-  postText.value="";
+  if(!postText.value) return;
+  posts.unshift({text:postText.value,pin:false});
+  savePosts(); postText.value="";
+}
+function savePosts(){
   localStorage.setItem("posts",JSON.stringify(posts));
   renderPosts();
 }
 function renderPosts(){
+  posts.sort((a,b)=>b.pin-a.pin);
   postsEl.innerHTML="";
-  posts.forEach(p=>{
-    postsEl.innerHTML+=`<div class="card">${p.text}</div>`;
+  posts.forEach((p,i)=>{
+    postsEl.innerHTML+=`
+      <div class="card">
+        ${p.pin?'<div class="pin">📌 고정</div>':''}
+        <div>${p.text}</div>
+        ${role==="artist"?`
+        <div class="admin-tools">
+          <span onclick="editPost(${i})">수정</span>
+          <span onclick="deletePost(${i})">삭제</span>
+          <span onclick="togglePin(${i})">고정</span>
+        </div>`:""}
+      </div>`;
   });
 }
+function editPost(i){
+  const t=prompt("수정",posts[i].text);
+  if(t!==null){posts[i].text=t;savePosts();}
+}
+function deletePost(i){
+  if(confirm("삭제?")){posts.splice(i,1);savePosts();}
+}
+function togglePin(i){
+  posts[i].pin=!posts[i].pin;
+  savePosts();
+}
 
-/* ===== NAV ===== */
+/* CHAT */
+function sendChat(){
+  if(!chatInput.value) return;
+  chats.push({
+    text:chatInput.value,
+    role,
+    date:new Date().toDateString()
+  });
+  localStorage.setItem("chats",JSON.stringify(chats));
+  chatInput.value="";
+  renderChat();
+}
+function renderChat(){
+  chatBox.innerHTML="";
+  let last="";
+  chats.forEach((m,i)=>{
+    if(m.date!==last){
+      chatBox.innerHTML+=`<div class="date">${m.date}</div>`;
+      last=m.date;
+    }
+    if(m.role==="artist"){
+      chatBox.innerHTML+=`
+      <div class="artist-wrap" ondblclick="adminChat(${i})">
+        ${profileImg?`<img src="${profileImg}">`:""}
+        <div>
+          <div class="artist-name">Forte</div>
+          <div class="msg artist">${m.text}</div>
+        </div>
+      </div>`;
+    }else{
+      chatBox.innerHTML+=`
+      <div class="msg fan">${m.text}</div>`;
+    }
+  });
+}
+function adminChat(i){
+  if(role!=="artist") return;
+  const a=prompt("1 수정 / 2 삭제");
+  if(a==="1"){
+    const t=prompt("수정",chats[i].text);
+    if(t!==null) chats[i].text=t;
+  }else if(a==="2"){
+    chats.splice(i,1);
+  }
+  localStorage.setItem("chats",JSON.stringify(chats));
+  renderChat();
+}
+
+/* NAV */
 function go(id,btn){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  if(btn)btn.classList.add("active");
+  btn.classList.add("active");
 }
 </script>
-
 </body>
 </html>
+
