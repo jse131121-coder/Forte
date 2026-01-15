@@ -1,149 +1,120 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>FORTE</title>
 
 <style>
+:root{
+  --bg:#000; --card:#111; --text:#fff; --sub:#aaa; --line:#222;
+  --white:#fff; --black:#000;
+}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 body{
-  margin:0;
-  background:#fff;
-  color:#000;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-  display:flex;
-  justify-content:center;
+  margin:0;background:var(--bg);color:var(--text);
+  display:flex;justify-content:center;
 }
 .app{
-  width:100%;
-  max-width:420px;
-  min-height:100vh;
-  border-left:1px solid #ddd;
-  border-right:1px solid #ddd;
+  width:100%;max-width:420px;min-height:100vh;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
 }
 header{
-  padding:14px;
-  text-align:center;
-  border-bottom:1px solid #ddd;
-  font-weight:600;
+  padding:16px;text-align:center;
+  border-bottom:1px solid var(--line);
+  letter-spacing:2px;font-weight:600;
 }
-section{
-  display:none;
-  padding:16px;
-  padding-bottom:90px;
-}
-section.active{display:block}
+section{display:none;padding:16px;padding-bottom:100px;}
+section.active{display:block;}
+
 nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  max-width:420px;
-  display:flex;
-  border-top:1px solid #ddd;
-  background:#fff;
+  position:fixed;bottom:0;width:100%;max-width:420px;
+  display:flex;border-top:1px solid var(--line);background:#000;
 }
 nav button{
-  flex:1;
-  padding:12px 0;
-  background:none;
-  border:none;
-  font-size:12px;
+  flex:1;padding:14px 0;background:none;border:none;
+  color:var(--sub);font-size:12px;
 }
-nav button.active{font-weight:600}
+nav button.active{color:var(--text);}
 
 .card{
-  border:1px solid #ddd;
-  border-radius:12px;
-  padding:14px;
-  margin-bottom:12px;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:14px;margin-bottom:12px;
 }
-textarea,input{
-  width:100%;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  margin-bottom:8px;
+
+input,textarea{
+  width:100%;background:#000;color:#fff;
+  border:1px solid var(--line);border-radius:8px;
+  padding:10px;margin-bottom:8px;
 }
+textarea{resize:none;}
+
 button.primary{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  background:#000;
-  color:#fff;
-  font-weight:600;
-}
-button.sub{
-  width:100%;
-  padding:10px;
-  border:1px solid #000;
-  background:#fff;
-  margin-bottom:8px;
+  width:100%;background:#fff;color:#000;
+  border:none;border-radius:8px;
+  padding:12px;font-weight:600;
 }
 
-.chat-box{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
+.badge{
+  font-size:10px;border:1px solid #fff;
+  padding:2px 6px;border-radius:999px;margin-left:6px;
 }
-.msg{
-  max-width:75%;
-  padding:8px 12px;
-  border-radius:12px;
-  font-size:13px;
-  white-space:pre-wrap;
-}
-.fan{
-  background:#000;
-  color:#fff;
-  align-self:flex-end;
-}
-.artist{
-  background:#eee;
-  align-self:flex-start;
-}
-.artist-wrap{
-  display:flex;
-  gap:8px;
-  align-items:flex-start;
-}
-.artist-wrap img{
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  object-fit:cover;
-}
-.artist-name{
-  font-size:11px;
-  font-weight:600;
-  margin-bottom:2px;
-}
-.date{
-  text-align:center;
-  font-size:11px;
-  color:#666;
-  margin:12px 0;
-}
-.admin-tools{
-  font-size:11px;
-  margin-top:6px;
-  display:flex;
-  gap:10px;
-}
-.pin{font-weight:600}
 
+/* LOGIN */
 .modal{
-  position:fixed;
-  inset:0;
-  background:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
+  position:fixed;inset:0;background:#000;
+  display:flex;align-items:center;justify-content:center;z-index:999;
 }
 .modal-box{
-  width:90%;
-  max-width:320px;
+  width:90%;max-width:320px;border:1px solid var(--line);
+  border-radius:12px;padding:20px;background:#000;
+}
+
+/* COMMUNITY */
+.comment{font-size:13px;color:var(--sub);margin-top:6px;white-space:pre-wrap;}
+
+/* CHAT */
+.chat-box{display:flex;flex-direction:column;gap:8px;}
+.date-line{
+  text-align:center;font-size:11px;color:var(--sub);margin:10px 0;
+}
+.msg-wrap{display:flex;gap:8px;align-items:flex-end;}
+.msg-wrap.me{justify-content:flex-end;}
+.msg-wrap.other{justify-content:flex-start;}
+
+.profile{
+  width:32px;height:32px;border-radius:50%;
+  background:#ccc;overflow:hidden;flex-shrink:0;
+}
+.profile img{width:100%;height:100%;object-fit:cover;}
+
+.msg{
+  max-width:65%;padding:8px 12px;
+  border-radius:14px;font-size:13px;
+  white-space:pre-wrap;
+}
+.me .msg{background:#fff;color:#000;border-bottom-right-radius:4px;}
+.other .msg{background:#111;border-bottom-left-radius:4px;}
+
+.name{
+  font-size:11px;color:var(--sub);margin-bottom:2px;
+}
+
+/* PROFILE EDIT */
+.profile-edit{
+  background:#fff;color:#000;
+  padding:14px;border-radius:12px;
+}
+.profile-edit input{
+  background:#fff;color:#000;border:1px solid #ccc;
+}
+
+/* ADMIN BUTTON */
+.admin-btn{
+  font-size:11px;border:1px solid #fff;
+  background:none;color:#fff;border-radius:6px;
+  padding:4px 6px;margin-left:4px;
 }
 </style>
 </head>
@@ -153,178 +124,157 @@ button.sub{
 <!-- LOGIN -->
 <div class="modal" id="loginModal">
   <div class="modal-box">
-    <h3>LOGIN</h3>
+    <h3 style="text-align:center;">LOGIN</h3>
     <input id="loginId" placeholder="ID">
     <input id="loginPw" type="password" placeholder="Password">
     <button class="primary" onclick="login()">ENTER</button>
   </div>
 </div>
 
-<div class="app" id="app" style="display:none">
-<header id="headerTitle">FORTE</header>
+<div class="app" id="app" style="display:none;">
+<header>FORTE</header>
 
-<section id="community" class="active">
-  <textarea id="postText" placeholder="Write something..."></textarea>
-  <button class="primary" onclick="addPost()">POST</button>
+<section id="home" class="active">
+  <div class="card">Forte Official Fan Space</div>
+</section>
+
+<section id="community">
+  <div class="card">
+    <textarea id="postText" placeholder="Write..."></textarea>
+    <button class="primary" onclick="addPost()">POST</button>
+  </div>
   <div id="posts"></div>
+</section>
+
+<section id="chatlist">
+  <div class="card" onclick="openChat()">FORTE CHAT</div>
 </section>
 
 <section id="chat">
   <div class="chat-box" id="chatBox"></div>
-  <textarea id="chatInput" placeholder="Message..."></textarea>
+  <textarea id="chatInput" placeholder="Message... (Ctrl+Enter)"></textarea>
   <button class="primary" onclick="sendChat()">SEND</button>
 </section>
 
-<section id="admin">
-  <div class="card">
-    <h4>Forte Profile</h4>
-    <input type="file" accept="image/*" onchange="uploadProfile(this)">
-  </div>
-  <div class="card">
-    <h4>Add Account</h4>
-    <input id="newId" placeholder="ID">
-    <input id="newPw" placeholder="Password">
-    <button class="sub" onclick="addAccount()">ADD</button>
+<section id="profile">
+  <div class="profile-edit">
+    <h4>Profile Edit</h4>
+    <input id="profileName" placeholder="Name">
+    <input type="file" id="profileImg">
+    <button class="primary" onclick="saveProfile()">SAVE</button>
   </div>
 </section>
 
 <nav>
-  <button class="active" onclick="go('community',this)">COMMUNITY</button>
-  <button onclick="go('chat',this)">CHAT</button>
-  <button id="adminBtn" onclick="go('admin',this)">ADMIN</button>
+  <button class="active" onclick="go('home',this)">HOME</button>
+  <button onclick="go('community',this)">COMMUNITY</button>
+  <button onclick="go('chatlist',this)">CHAT</button>
+  <button onclick="go('profile',this)">PROFILE</button>
 </nav>
 </div>
 
 <script>
-/* STATE */
-let role=null;
-let accounts=JSON.parse(localStorage.getItem("accounts"))||[
-  {id:"Artist",pw:"Artist",role:"fan"},
-  {id:"Forte",pw:"01024773752",role:"artist"}
-];
-let posts=JSON.parse(localStorage.getItem("posts"))||[];
-let chats=JSON.parse(localStorage.getItem("chats"))||[];
-let profileImg=localStorage.getItem("profileImg")||"";
+let user=null;
 
 /* LOGIN */
 function login(){
   const id=loginId.value.trim();
   const pw=loginPw.value.trim();
-  const acc=accounts.find(a=>a.id===id && a.pw===pw);
-  if(!acc){alert("로그인 실패");return;}
-  role=acc.role;
+
+  if((id==="Forte"&&pw==="01024773752")||(id==="Admin"&&pw==="Admin")){
+    user={id,role:"admin"};
+  }else if(id&&pw){
+    user={id,role:"fan"};
+  }else return alert("로그인 실패");
+
+  localStorage.setItem("user",JSON.stringify(user));
   loginModal.style.display="none";
   app.style.display="block";
-  if(role!=="artist") adminBtn.style.display="none";
+  loadAll();
+}
+
+/* LOAD */
+let posts=[], chats=[], profiles={};
+function loadAll(){
+  posts=JSON.parse(localStorage.getItem("posts")||"[]");
+  chats=JSON.parse(localStorage.getItem("chats")||"[]");
+  profiles=JSON.parse(localStorage.getItem("profiles")||"{}");
   renderPosts(); renderChat();
-}
-
-/* ACCOUNTS */
-function addAccount(){
-  accounts.push({id:newId.value,pw:newPw.value,role:"fan"});
-  localStorage.setItem("accounts",JSON.stringify(accounts));
-  alert("계정 추가됨");
-  newId.value=""; newPw.value="";
-}
-
-/* PROFILE */
-function uploadProfile(input){
-  const file=input.files[0];
-  const reader=new FileReader();
-  reader.onload=()=>{
-    profileImg=reader.result;
-    localStorage.setItem("profileImg",profileImg);
-    alert("프로필 저장됨");
-    renderChat();
-  };
-  reader.readAsDataURL(file);
 }
 
 /* COMMUNITY */
 function addPost(){
-  if(!postText.value) return;
-  posts.unshift({text:postText.value,pin:false});
-  savePosts(); postText.value="";
-}
-function savePosts(){
+  if(!postText.value.trim()) return;
+  posts.unshift({text:postText.value,user:user.id,pin:false});
   localStorage.setItem("posts",JSON.stringify(posts));
-  renderPosts();
+  postText.value=""; renderPosts();
 }
 function renderPosts(){
   posts.sort((a,b)=>b.pin-a.pin);
   postsEl.innerHTML="";
   posts.forEach((p,i)=>{
     postsEl.innerHTML+=`
-      <div class="card">
-        ${p.pin?'<div class="pin">📌 고정</div>':''}
-        <div>${p.text}</div>
-        ${role==="artist"?`
-        <div class="admin-tools">
-          <span onclick="editPost(${i})">수정</span>
-          <span onclick="deletePost(${i})">삭제</span>
-          <span onclick="togglePin(${i})">고정</span>
-        </div>`:""}
-      </div>`;
+    <div class="card">
+      <b>${p.user}${p.pin?" 📌":""}</b>
+      <p>${p.text}</p>
+      ${user.role==="admin"?`
+      <button class="admin-btn" onclick="pinPost(${i})">PIN</button>
+      <button class="admin-btn" onclick="delPost(${i})">DEL</button>`:""}
+    </div>`;
   });
 }
-function editPost(i){
-  const t=prompt("수정",posts[i].text);
-  if(t!==null){posts[i].text=t;savePosts();}
-}
-function deletePost(i){
-  if(confirm("삭제?")){posts.splice(i,1);savePosts();}
-}
-function togglePin(i){
-  posts[i].pin=!posts[i].pin;
-  savePosts();
-}
+function delPost(i){posts.splice(i,1);savePosts();}
+function pinPost(i){posts[i].pin=!posts[i].pin;savePosts();}
+function savePosts(){localStorage.setItem("posts",JSON.stringify(posts));renderPosts();}
 
 /* CHAT */
+function openChat(){go("chat");renderChat();}
 function sendChat(){
-  if(!chatInput.value) return;
-  chats.push({
-    text:chatInput.value,
-    role,
-    date:new Date().toDateString()
-  });
+  if(!chatInput.value.trim()) return;
+  chats.push({text:chatInput.value,user:user.id,time:new Date().toLocaleDateString()});
   localStorage.setItem("chats",JSON.stringify(chats));
-  chatInput.value="";
-  renderChat();
+  chatInput.value=""; renderChat();
 }
+chatInput.addEventListener("keydown",e=>{
+  if(e.ctrlKey&&e.key==="Enter") sendChat();
+});
 function renderChat(){
   chatBox.innerHTML="";
-  let last="";
-  chats.forEach((m,i)=>{
-    if(m.date!==last){
-      chatBox.innerHTML+=`<div class="date">${m.date}</div>`;
-      last=m.date;
+  let lastDate="";
+  chats.forEach(m=>{
+    if(m.time!==lastDate){
+      chatBox.innerHTML+=`<div class="date-line">${m.time}</div>`;
+      lastDate=m.time;
     }
-    if(m.role==="artist"){
-      chatBox.innerHTML+=`
-      <div class="artist-wrap" ondblclick="adminChat(${i})">
-        ${profileImg?`<img src="${profileImg}">`:""}
-        <div>
-          <div class="artist-name">Forte</div>
-          <div class="msg artist">${m.text}</div>
-        </div>
-      </div>`;
-    }else{
-      chatBox.innerHTML+=`
-      <div class="msg fan">${m.text}</div>`;
-    }
+    const me=m.user===user.id;
+    const prof=profiles[m.user];
+    chatBox.innerHTML+=`
+    <div class="msg-wrap ${me?"me":"other"}">
+      ${!me?`<div class="profile">${prof?.img?`<img src="${prof.img}">`:""}</div>`:""}
+      <div>
+        ${!me?`<div class="name">${prof?.name||m.user}</div>`:""}
+        <div class="msg">${m.text}</div>
+      </div>
+    </div>`;
   });
 }
-function adminChat(i){
-  if(role!=="artist") return;
-  const a=prompt("1 수정 / 2 삭제");
-  if(a==="1"){
-    const t=prompt("수정",chats[i].text);
-    if(t!==null) chats[i].text=t;
-  }else if(a==="2"){
-    chats.splice(i,1);
+
+/* PROFILE */
+function saveProfile(){
+  const name=profileName.value||user.id;
+  const file=profileImg.files[0];
+  if(file){
+    const r=new FileReader();
+    r.onload=()=>{profiles[user.id]={name,img:r.result};finishProfile();}
+    r.readAsDataURL(file);
+  }else{
+    profiles[user.id]={name};
+    finishProfile();
   }
-  localStorage.setItem("chats",JSON.stringify(chats));
-  renderChat();
+}
+function finishProfile(){
+  localStorage.setItem("profiles",JSON.stringify(profiles));
+  alert("저장 완료");
 }
 
 /* NAV */
@@ -332,9 +282,10 @@ function go(id,btn){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
+  btn?.classList.add("active");
 }
 </script>
 </body>
 </html>
+
 
